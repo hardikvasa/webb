@@ -5,7 +5,7 @@ A Python based web crawler to crawl and store information from the web pages in 
 This is a Python script to download, crawl and index the web in sequential manner. It uses a breath-first search technique to crawl all the webpages on a given domain and even outside the domain. 
 
 ## Compatability
-This program is written in Python 3.4 and can run on any version of Ptyhon 3 (3.x). It is a download-and-run program with couple of changes according to requirements. Support for Python 2.x will be added soon!!
+This program is compatible with both Python 2 (2.x) as well as Python 3 (3.x). It is a download-and-run program with couple of changes according if required by the user.
 
 ##Dependencies
 There are no dependencies to this project. It runs on the functions of the standard in-build library support. It does not need any external support or installations. Just download and run!!!
