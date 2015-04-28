@@ -2,18 +2,36 @@
 
 #Import Libraries
 import time     #For Delay
-import urllib.request    #Extracting web pages
+import sys    #for system related information
+
+# This is the first page from where the crawler starts crawling
+reference_seed_page = "http://www.zseries.in"     #Defining the seed URL (should be with a prefix, netloc and scheme and without path)
 
 
-#Downloading entire Web Document (Raw)
-def download_page(a):
-    opener = urllib.request.FancyURLopener({})
-    try:
-        open_url = opener.open(a)
-        page = str(open_url.read()).replace('\\n', '').replace('\\t', '')
-        return page
-    except:
-        return""
+#Downloading entire Web Document (Raw Page Content)
+def download_page(url):
+    version = (3,0)
+    cur_version = sys.version_info
+    if cur_version >= version:     #If the Current Version of Python is 3.0 or above
+        import urllib.request    #urllib library for Extracting web pages
+        opener = urllib.request.FancyURLopener({})
+        try:
+            open_url = opener.open(url)
+            page = str(open_url.read()).replace('\\n', '')
+            return page
+        except Exception as e:
+                print(str(e))
+    else:                        #If the Current Version of Python is 2.x
+        import urllib2
+        try:
+            headers = {}
+            headers['User-Agent'] = "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
+            req = urllib2.Request(url, headers = headers)
+            response = urllib2.urlopen(req)
+            page = response.read()
+            return page    
+        except:
+            return"Page Not found"
 
 
 #Finding 'Next Link' on a given web page
@@ -107,7 +125,6 @@ def url_parse(url):
     return(url, flag)
 
 
-reference_seed_page = "http://www.zseries.in"     #Defining the seed URL (should be with a prefix, netloc and scheme and without path)
      
 t0 = time.time()
 #Main Crawl function that calls all the above function and crawls the entire site sequentially
