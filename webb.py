@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 #Version 0.8 [Upgraded the URL parser to remove unwanted fragments, queries and non web documents as links]
+#@Hardik Vasa
 
 #Import Libraries
 import time     #For Delay
