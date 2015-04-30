@@ -5,13 +5,31 @@
 #Import Libraries
 import time     #For Delay
 import sys    #for system related information
+from subprocess import Popen, PIPE
+import socket
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
     
    
+#Get IP of a website from the URL
+def get_ip(url):
+    ip = socket.gethostbyname(url)
+    print(ip)
+    
+    
+#Traceroute to a website
+def traceroute(url):
+    p = Popen(['tracert', url], stdout=PIPE)
+    while True:
+        line = p.stdout.readline()
+        line2 = str(line).replace('\\r','').replace('\\n','')
+        print(line2)
+        if not line:
+            break
         
+                
 #Downloading entire Web Document (Raw Page Content) for the crawler
 def download_page(url):
     version = (3,0)
@@ -64,8 +82,8 @@ def find_next_link(s):
         return link, end_quote
           
 
-#Getting all links with the help of 'get_next_links' for users
-def find_all_links(url):
+#Getting all links as list with the help of 'get_next_links' for users
+def find_all_links_as_list(url):
     page = download_page(url)
     links = []
     while True:
@@ -79,6 +97,11 @@ def find_all_links(url):
     return links 
 
 
+#Get all the links from the find_all_links_as_list function and print it in order
+def find_all_links(url):
+    lists = find_all_links_as_list(url)
+    for i in lists:
+        print(i)
 
 
 #Finding 'Next Link' on a given web page for crawler
@@ -124,6 +147,56 @@ def extension_scan(url):
             j = j+1
     #print(flag2)
     return flag2
+
+
+
+#URL parsing for incomplete or duplicate URLs
+def url_normalize(url,seed):
+    try:
+        from urllib.parse import urlparse
+    except ImportError:
+        from urlparse import urlparse
+    url = url.lower()    #Make it lower case
+    s = urlparse(url)       #parse the given url
+    seed_page = seed.lower()       #Make it lower case
+    t = urlparse(seed_page)     #parse the seed page (reference page)
+    i = 0
+    while i<=7:
+        if url == "/":
+            url = seed_page
+            flag = 0  
+        elif not s.scheme:
+            url = "http://" + url
+            flag = 0
+        elif "#" in url:
+            url = url[:url.find("#")]
+        elif "?" in url:
+            url = url[:url.find("?")]
+        elif s.netloc == "":
+            url = seed_page + s.path
+            flag = 0
+        elif "www" not in url:
+            url = "www."[:7] + url[7:]
+            flag = 0
+            
+        elif url[len(url)-1] == "/":
+            url = url[:-1]
+            flag = 0
+        elif s.netloc != t.netloc:
+            url = url
+            flag = 1
+            break        
+        else:
+            url = url
+            flag = 0
+            break
+        i = i+1
+        s = urlparse(url)   #Parse after every loop to update the values of url parameters
+    if flag == 0:
+        print("Normalized (Absolute) URL: " + url)
+    else:
+        print("Invalid URL")
+
 
 
 #URL parsing for incomplete or duplicate URLs
