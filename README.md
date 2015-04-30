@@ -35,7 +35,7 @@ There are no dependencies to this project. It functions entirely of the standard
 `print (webb.find_all_links("your-web-page-url"))`
 
 * Crawl web pages in breathe-first manner:  
-`webb.web_crawl("your-web-page-url")
+`webb.web_crawl("your-web-page-url")`
 
 * Crawl web pages with delay of 2 seconds after every page crawled:  
 `webb.web_crawl("your-web-page-url",2)`
