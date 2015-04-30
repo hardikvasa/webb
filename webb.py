@@ -3,7 +3,7 @@
 # @Hardik Vasa
 
 #Import Libraries
-import time     #For Delay
+import time     #For Delay calculations
 import sys    #for system related information
 from subprocess import Popen, PIPE
 import socket
@@ -267,7 +267,7 @@ def web_crawl(*arg):
                 pass        #Do Nothing
             else:       #If the URL is not already crawled, then crawl i and extract all the links from it
                 print("\n"+urll)
-                if len(arg)==2:
+                if len(arg)>1:
                     delay = arg[1]
                     time.sleep(delay)
                 #print(download_page(urll))
@@ -292,3 +292,77 @@ def web_crawl(*arg):
             print("Pages to Crawl = " + str(len(to_crawl)))
             print("Pages Crawled = " + str(len(crawled)))
     return ''
+
+
+
+#Finding 'Next Image' from the given raw page for users (image search)
+def get_next_image_link(s):
+    start_line = s.find('rg_di')
+    if start_line == -1:    #If no links are found then give an error!
+        end_quote = 0
+        link = "no_links"
+        return link, end_quote
+    else:
+        start_line = s.find('"class="rg_di"')
+        start_content = s.find('imgurl=',start_line+1)
+        end_content = s.find('&amp;',start_content+1)
+        content_raw = str(s[start_content+7:end_content])
+        return content_raw, end_content
+          
+
+#Getting all links with the help of 'get_next_image_link'
+def get_all_image_links(page):
+    items = []
+    while True:
+        item, end_content = get_next_image_link(page)
+        if item == "no_links":
+            break
+        else:
+            items.append(item)      #Append all the links in the list named 'Links'
+            #time.sleep(0.1)        #Timer could be used to slow down the request for image downloads
+            page = page[end_content:]
+    return items
+
+
+############## Download Google Images ############
+#Download Image Links
+def download_google_images(search_keyword):
+    result = (str(type(search_keyword)))
+    if 'list' in result:
+        i= 0
+        while i<len(search_keyword):
+            items = []
+            iteration = "Item no.: " + str(i+1) + " -->" + " Item name = " + str(search_keyword[i])
+            print (iteration)
+            search_keywords = search_keyword[i]
+            search = search_keywords.replace(' ','%20')
+            
+            url = 'https://www.google.com/search?q=' + search +  '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
+            raw_html =  (download_page(url))
+            items = items + (get_all_image_links(raw_html))
+                
+            print ("Image Links = "+str(items))
+            print ("Total Image Links = "+str(len(items)))
+            print ("\n")
+            i = i+1
+                
+            info = open('output.txt', 'a')        #Open the text file called database.txt
+            info.write(str(i) + ': ' + str(search_keyword[i-1]) + ": " + str(items) + "\n\n\n")     #Write the title of the page
+            info.close()                            #Close the file      
+    else:
+        items = []
+        iteration = "Item name = " + str(search_keyword)
+        print (iteration)
+        search = search_keyword.replace(' ','%20')
+        
+        url = 'https://www.google.com/search?q=' + search +  '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
+        raw_html =  (download_page(url))
+        items = items + (get_all_image_links(raw_html))
+            
+        print ("Image Links = "+str(items))
+        print ("Total Image Links = "+str(len(items)))
+        print ("\n")
+            
+        info = open('output.txt', 'a')        #Open the text file called database.txt
+        info.write(str(search_keyword) + ": " + str(items) + "\n\n\n")         #Write the title of the page
+        info.close()                            #Close the file
