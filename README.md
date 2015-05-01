@@ -50,10 +50,10 @@ There are no dependencies to this project. It functions entirely of the standard
 `webb.download_google_images("keyword")`  or `webb.download_google_images(['keyword 1','keyword 2','keyword 3'])`
 
 * Get links of all the images in a given web page:  
-`webb.get_all_images("your-seed-page-url")`
+`webb.get_all_images("your-web-page-url")`
 
 * Get links of all the images in a given web page and download all those images on local disk (computer):  
-`webb.get_all_images("your-seed-page-url","download")`
+`webb.get_all_images("your-web-page-url","download")`
 
 ### Status
 This is a stand-alone python script which is ready-to-run, but still under development. Many more features will be added to it shortly.
