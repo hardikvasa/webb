@@ -11,7 +11,7 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
-    
+
    
 #Get IP of a website from the URL
 def get_ip(url):
@@ -68,42 +68,6 @@ def title(url):
 
 
 
-#Finding 'Next Link' on a given web page for users
-def find_next_link(s):
-    start_link = s.find("<a href")
-    if start_link == -1:    #If no links are found then give an error!
-        end_quote = 0
-        link = "no_links"
-        return link, end_quote
-    else:
-        start_quote = s.find('"', start_link)
-        end_quote = s.find('"',start_quote+1)
-        link = str(s[start_quote+1:end_quote])
-        return link, end_quote
-          
-
-#Getting all links as list with the help of 'get_next_links' for users
-def find_all_links_as_list(url):
-    page = download_page(url)
-    links = []
-    while True:
-        link, end_link = find_next_link(page)
-        if link == "no_links":
-            break
-        else:
-            links.append(link)      #Append all the links in the list named 'Links'
-            #time.sleep(0.1)
-            page = page[end_link:]
-    return links 
-
-
-#Get all the links from the find_all_links_as_list function and print it in order
-def find_all_links(url):
-    lists = find_all_links_as_list(url)
-    for i in lists:
-        print(i)
-
-
 #Finding 'Next Link' on a given web page for crawler
 def get_next_link(s):
     start_link = s.find("<a href")
@@ -150,15 +114,11 @@ def extension_scan(url):
 
 
 
-#URL parsing for incomplete or duplicate URLs
-def url_normalize(url,seed):
-    try:
-        from urllib.parse import urlparse
-    except ImportError:
-        from urlparse import urlparse
+#URL parsing for incomplete or duplicate URLs for users
+def url_normalize(url,seed_page):
     url = url.lower()    #Make it lower case
     s = urlparse(url)       #parse the given url
-    seed_page = seed.lower()       #Make it lower case
+    seed_page = seed_page.lower()       #Make it lower case
     t = urlparse(seed_page)     #parse the seed page (reference page)
     i = 0
     while i<=7:
@@ -193,13 +153,13 @@ def url_normalize(url,seed):
         i = i+1
         s = urlparse(url)   #Parse after every loop to update the values of url parameters
     if flag == 0:
-        print("Normalized (Absolute) URL: " + url)
+        return url
     else:
-        print("Invalid URL")
+        return "Invalid URL"
 
 
 
-#URL parsing for incomplete or duplicate URLs
+#URL parsing for incomplete or duplicate URLs for crawler
 def url_parse(url,seed_page):
     url = url.lower().replace(' ','%20')    #Make it lower case
     s = urlparse(url)       #parse the given url
@@ -240,7 +200,61 @@ def url_parse(url,seed_page):
     return(url, flag)
 
 
-     
+
+
+#Finding 'Next Link' on a given web page for users
+def find_next_link(s):
+    start_link = s.find("<a href")
+    if start_link == -1:    #If no links are found then give an error!
+        end_quote = 0
+        link = "no_links"
+        return link, end_quote
+    else:
+        start_quote = s.find('"', start_link)
+        end_quote = s.find('"',start_quote+1)
+        link = str(s[start_quote+1:end_quote])
+        return link, end_quote
+          
+
+#Getting all links as list with the help of 'get_next_links' for users
+def find_all_links_as_list(url):
+    page = download_page(url)
+    links = []
+    while True:
+        link, end_link = find_next_link(page)
+        if link == "no_links":
+            break
+        else:
+            links.append(link)      #Append all the links in the list named 'Links'
+            #time.sleep(0.1)
+            page = page[end_link:]
+    return links 
+
+
+
+#Get all the links from the find_all_links_as_list function and print it in order for users
+def find_all_links(*arg):
+    url = arg[0]
+    s = urlparse(url)
+    if not s.scheme:
+        url = "http://" + url
+    t = urlparse(url)
+    seed_page = t.scheme+'://'+t.netloc
+    print(seed_page)
+    lists = find_all_links_as_list(url)
+    if len(arg)>1:
+        if arg[1] == "absolute":
+            for i in lists:
+                i = url_normalize(i,seed_page)
+                print(i)
+        else:
+            print("Invalid Second Argument")
+    else:    
+        for i in lists:
+            print(i)     
+
+
+
 
 #Main Crawl function that calls all the above function and crawls the entire site sequentially
 def web_crawl(*arg):
@@ -366,3 +380,59 @@ def download_google_images(search_keyword):
         info = open('output.txt', 'a')        #Open the text file called database.txt
         info.write(str(search_keyword) + ": " + str(items) + "\n\n\n")         #Write the title of the page
         info.close()                            #Close the file
+
+
+
+######### Images Download From a Webpage #########        
+#Finding 'Next Image Link' for get_all_images
+def get_next_images_link(s):
+    start_line = s.find("<img")
+    if start_line == -1:    #If no links are found then give an error!
+        end_quote = 0
+        link = "no_links"
+        return link, end_quote
+    else:
+        start_link = s.find('src=', start_line)
+        end_link = s.find('"',start_link+5)
+        link = str(s[start_link+5:end_link])
+        return link, end_link
+          
+
+#Getting all image links with the help of 'get_next_links' for get_all_images
+def get_all_images_links(url):
+    page = download_page(url)
+    links = []
+    while True:
+        link, end_link = get_next_images_link(page)
+        if link == "no_links":
+            break
+        else:
+            links.append(link)      #Append all the links in the list named 'Links'
+            page = page[end_link:]
+    return links 
+
+
+#Download all images in hard disk
+def get_all_images(*arg):
+    url = arg[0]
+    import urllib
+    links = get_all_images_links(url)
+    print(links)
+    if len(arg)>1 and arg[1] == "download":
+        s = urlparse(url)
+        seed_page = s.scheme+'://'+s.netloc
+        i = 0
+        while i<len(links):
+            link,flag = url_parse(links[i],seed_page)
+            print("downloading --> "+link)
+            try:
+                file = urllib.URLopener()
+                file.retrieve(link, str("img "+str(i)+".jpg"))
+            except:
+                pass
+            i = i+1
+    else:
+        pass
+    
+
+########## End ##########
