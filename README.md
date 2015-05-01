@@ -31,8 +31,11 @@ There are no dependencies to this project. It functions entirely of the standard
 * Find all the links in a web page and print it one below the other:  
 `webb.find_all_links("your-web-page-url")`
 
+* Find all the URLs in a page and convert them into absolute URLs and print it
+`webb.find_all_links("www.zseries.in","absolute")`
+
 * Find all the links in a pirticular web page and print it as a list:  
-`print (webb.find_all_links("your-web-page-url"))`
+`print (webb.find_all_links_as_list("your-web-page-url"))`
 
 * Crawl web pages in breathe-first manner:  
 `webb.web_crawl("your-web-page-url")`
@@ -41,12 +44,16 @@ There are no dependencies to this project. It functions entirely of the standard
 `webb.web_crawl("your-web-page-url",2)`
 
 * Normalize URL (Convert Relative URL to absolute URL):  
-`webb.url_normalize("your-relative-url","your-seed-page-url")`
+`print(webb.url_normalize("your-relative-url","your-seed-page-url"))`
 
 * Download Google Images from keywords:
 `webb.download_google_images("keyword")`  or `webb.download_google_images(['keyword 1','keyword 2','keyword 3'])`
 
+* Get links of all the images in a given web page:  
+`webb.get_all_images("your-seed-page-url")`
 
+* Get links of all the images in a given web page and download all those images on local disk (computer):  
+`webb.get_all_images("your-seed-page-url","download")`
 
 ### Status
 This is a stand-alone python script which is ready-to-run, but still under development. Many more features will be added to it shortly.
