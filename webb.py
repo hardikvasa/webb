@@ -6,6 +6,7 @@
 import time     #For Delay calculations
 import sys    #for system related information
 from subprocess import Popen, PIPE
+import re
 import socket
 try:
     from urllib.parse import urlparse
@@ -256,6 +257,7 @@ def find_all_links(*arg):
 
 
 
+###### Main Crawler Function ######
 #Main Crawl function that calls all the above function and crawls the entire site sequentially
 def web_crawl(*arg):
     
@@ -305,7 +307,23 @@ def web_crawl(*arg):
             print("Iteration No. = " + str(i))
             print("Pages to Crawl = " + str(len(to_crawl)))
             print("Pages Crawled = " + str(len(crawled)))
+            
+            if len(arg)>1:
+                if arg[2]=="write_log":
+                    file = open('log.txt', 'a')        #Open the text file called database.txt
+                    file.write("URL: " + urll + "\n")         #Write the title of the page
+                    file.write("Iteration No. = " + str(i) + "\n")
+                    file.write("Pages to Crawl = " + str(len(to_crawl)) + "\n")
+                    file.write("Pages Crawled = " + str(len(crawled)) + "\n\n")
+                    file.close()                            #Close the file
     return ''
+
+
+
+#Removing HTML tags from the content
+def pure_text(page):
+    pure_text = (re.sub(r'<.+?>', '', page))       #From '<' to the next '>'
+    return pure_text
 
 
 
@@ -336,6 +354,7 @@ def get_all_image_links(page):
             #time.sleep(0.1)        #Timer could be used to slow down the request for image downloads
             page = page[end_content:]
     return items
+
 
 
 ############## Download Google Images ############
@@ -383,6 +402,7 @@ def download_google_images(search_keyword):
 
 
 
+
 ######### Images Download From a Webpage #########        
 #Finding 'Next Image Link' for get_all_images
 def get_next_images_link(s):
@@ -398,6 +418,7 @@ def get_next_images_link(s):
         return link, end_link
           
 
+
 #Getting all image links with the help of 'get_next_links' for get_all_images
 def get_all_images_links(url):
     page = download_page(url)
@@ -410,6 +431,7 @@ def get_all_images_links(url):
             links.append(link)      #Append all the links in the list named 'Links'
             page = page[end_link:]
     return links 
+
 
 
 #Download all images in hard disk
@@ -434,5 +456,47 @@ def get_all_images(*arg):
     else:
         pass
     
+
+
+
+###### Extract Paragraphs ######
+#Finding 'Next Paragraph' on a given web page for users
+def get_next_paragraph(s):
+    start_link = s.find("<p")
+    if start_link == -1:    #If no links are found then give an error!
+        end_quote = 0
+        link = "no_links"
+        return link, end_quote
+    else:
+        start_quote = s.find('>', start_link+1)
+        end_quote = s.find('</p>',start_quote+1)
+        link = str(s[start_quote+1:end_quote])
+        return link, end_quote
+
+          
+
+#Getting all paragraphs with the help of 'get_next_paragraph_as_list' for users
+def get_all_paragraphs_as_list(url):
+    links = []
+    page = download_page(url)
+    while True:
+        link, end_link = get_next_paragraph(page)
+        link = link.replace('\n',' ')
+        link = re.sub(r'<.+?>', '', link)
+        if link == "no_links":
+            break
+        else:
+            links.append(link)      #Append all the links in the list named 'Links'
+            #time.sleep(0.1)
+            page = page[end_link:]
+    return links 
+
+#Get all the paragraphs one below the other with the help of get_all_paragraphs_as_list for users
+def get_all_paragraphs(url):
+    lists = get_all_paragraphs_as_list(url)
+    for i in lists:
+        print(i)
+        
+
 
 ########## End ##########
