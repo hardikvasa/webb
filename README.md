@@ -2,13 +2,13 @@
 An all-in-one Python library to scrap, parse and crawl web pages
 
 ### Gist
-This is a light-weight, dynamic and featured Python library crawl, download, index, parse, scrap analyze web pages in a systematic manner.
+This is a light-weight, dynamic and featured Python library. It can be used to **crawl, download, index, parse, scrap and analyze web pages** in a systematic manner or any of the individual function. It is also used to **clean web pages, store web data and import/export relevant components** from the internet. Some of the other features also include **downloading google images and spidering wikipedia database**.
 
 ### Compatability
 This library is compatible with both Python 2 (2.x) as well as Python 3 (3.x) versions. It is a download-import-and-run program with no or little changes as required by users.
 
 ### Dependencies
-There are no dependencies to this project. It functions entirely of the standard in-build library support. It does not need any external support or installations. Just download and run!!!
+There are **no dependencies** to this project. It functions entirely of the standard in-build library support. It does not need any external support or installations. Just download and run!!!
 
 ### Usage
 1. Download `webb.py`
@@ -43,6 +43,9 @@ There are no dependencies to this project. It functions entirely of the standard
 * Crawl web pages with delay of 2 seconds after every page crawled:  
 `webb.web_crawl("your-web-page-url",2)`
 
+* Crawl an entire website with no (0 seconds) delay while writing the crawl data into a log file
+`webb.web_crawl("your-web-page-url",0,"write_log")`
+
 * Normalize URL (Convert Relative URL to absolute URL):  
 `print(webb.url_normalize("your-relative-url","your-seed-page-url"))`
 
@@ -55,9 +58,17 @@ There are no dependencies to this project. It functions entirely of the standard
 * Get links of all the images in a given web page and download all those images on local disk (computer):  
 `webb.get_all_images("your-web-page-url","download")`
 
+* Clean an HTML page by removing all the HTML tags:  
+`print(webb.pure_text("your-web-page"))`
+
+* Get all paragraphs of a given web page one below the other:  
+`webb.get_all_paragraphs("your-web-page-url")`
+
+* Get all paragraphs of a given web page one below the other:  
+`print(webb.get_all_paragraphs_as_list("your-web-page-url"))`
+
 ### Status
 This is a stand-alone python script which is ready-to-run, but still under development. Many more features will be added to it shortly.
-
 
 ### Disclaimer
 The crawler function lets you download  and crawl tons of web pages. Please do not download and crawl any pages of a domain without reading about the robot.txt file of that domain. 
