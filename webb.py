@@ -163,8 +163,7 @@ def find_next_link(s):
           
 
 #Getting all links as list with the help of 'get_next_links' for users
-def find_all_links_as_list(url):
-    page = download_page(url)
+def find_all_links_as_list(page):
     links = []
     while True:
         link, end_link = find_next_link(page)
@@ -180,25 +179,65 @@ def find_all_links_as_list(url):
 
 #Get all the links from the find_all_links_as_list function and print it in order for users
 def find_all_links(*arg):
-    url = arg[0]
-    s = urlparse(url)
-    if not s.scheme:
-        url = "http://" + url
-    t = urlparse(url)
-    seed_page = t.scheme+'://'+t.netloc
-    print(seed_page)
-    lists = find_all_links_as_list(url)
-    if len(arg)>1:
-        if arg[1] == "absolute":
+    if arg[1] == 'url' or arg[1] == 'link':
+        url = arg[0]
+        while True:
+            if "http" not in url:
+                url = "http://" + url
+            elif "www" not in url:
+                url = "www."[:7] + url[7:]
+            else:
+                break
+        t = urlparse(url)
+        seed_page = t.scheme+'://'+t.netloc
+        page = download_page(url)
+        lists = find_all_links_as_list(page)
+        if len(arg)>2:
+            if arg[2] == "absolute":
+                if len(arg)>3:
+                    if arg[3] == 'list':
+                        i = 0
+                        while i < len(lists):
+                            lists[i] = url_normalize(lists[i],seed_page)
+                            i = i+1
+                        return lists
+                else:
+                    for i in lists:
+                        i = url_normalize(i,seed_page)
+                        print(i)
+            elif arg[2] == "list":
+                return lists
+            else:
+                print("Invalid Third Argument")
+        else:    
             for i in lists:
-                i = url_normalize(i,seed_page)
+                print(i)     
+    elif arg[1] == 'content':
+        page = arg[0]
+        lists = find_all_links_as_list(page)
+        if len(arg)>2:
+            if arg[2] == "absolute":
+                seed_page = arg[3]
+                if len(arg)>4:
+                    if arg[4] == 'list':
+                        i = 0
+                        while i < len(lists):
+                            lists[i] = url_normalize(lists[i],seed_page)
+                            i = i+1
+                        return lists
+                else:
+                    for i in lists:
+                        i = url_normalize(i,seed_page)
+                        print(i)
+            elif arg[2] == "list":
+                return lists
+            else:
+                print("Invalid Third Argument")
+        else:    
+            for i in lists:
                 print(i)
-        else:
-            print("Invalid Second Argument")
-    else:    
-        for i in lists:
-            print(i)     
-
+    else:
+        page = 'no_links'
 
 
 
