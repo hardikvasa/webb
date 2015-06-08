@@ -7,6 +7,8 @@ This is a light-weight, dynamic and highly-flexible Python library. It can be us
 ### Usage and Instructions
 For usage and instructions please visit the [Official Documentation](Documentation.md)
 
+For sample codes and examples, please visit [Examples Codes](examples)
+
 
 ### Compatability
 This library is compatible with both Python 2 (2.x) as well as Python 3 (3.x) versions. It is a download-import-and-run program with no or little changes as required by users.
