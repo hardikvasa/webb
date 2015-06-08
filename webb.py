@@ -679,4 +679,9 @@ def download_google_images(*arg):
             pass
 
 
+#Clean HTML Tags
+def clean_html_tags(page):
+    pure_text = (re.sub(r'<.+?>', '', page)).replace('\n', ',')
+    return pure_text
+
 ########## End ##########
