@@ -14,6 +14,10 @@ This is a official documentation of the **webb** library in Python
 * Get IP address of a webpage:  
 `webb.get_ip("your-web-page-url")`
 
+### Normalize a Web Page
+* Remove/Clean All HTML tags from Web Page:  
+`print(webb.clean_html_tags("your-web-page"))`
+
 ### Downloading HTML Web Page
 * Download entire HTML page:  
 `print(webb.download_page("your-web-page-url"))`
