@@ -18,7 +18,7 @@ This is a official documentation of the **webb** library in Python
 * Download entire HTML page:  
 `print(webb.download_page("your-web-page-url"))`
 
-### Normalize Web Page
+### Normalize Web Page URL
 * Normalize URL (Convert Relative URL to absolute URL):  
 `print(webb.url_normalize("your-relative-url","your-seed-page-url"))`
 
