@@ -7,6 +7,14 @@ This is a official documentation of the **webb** library in Python
 3. Import the webb library by writing `import webb` in the `main.py` file
 4. Once this is done, use any of the following commands
 
+**or**
+
+`python -m pip install webb`
+
+**or**
+
+`python install setup.py` (for windows users using command prompt)
+
 ### Web Site Information
 * Traceroute a URL:  
 `webb.traceroute("your-web-page-url")`
@@ -34,7 +42,7 @@ This is a official documentation of the **webb** library in Python
 * Find all the links in a web page and print it one below the other (by passing in URL as input):  
 `webb.find_all_links('your-web-page-url','link')`
 
-* Find all the links in a pirticular web page and print it as a list (by passing in URL as input):  
+* Find all the links in a particular web page and print it as a list (by passing in URL as input):  
 `print(webb.find_all_links('your-web-page-url','link','list'))`
 
 * Find all the URLs in a page and convert them into absolute URLs and print it (by passing in URL as input):  
@@ -48,7 +56,7 @@ This is a official documentation of the **webb** library in Python
 * Find all the links in a web page and print it one below the other (by passing in Page Content as input): 
 `webb.find_all_links(page,'content')`
 
-* Find all the links in a pirticular web page and print it as a list (by passing in Page Content as input):  
+* Find all the links in a particular web page and print it as a list (by passing in Page Content as input):  
 `print(webb.find_all_links(page,'content','list'))`
 
 * Find all the URLs in a page and convert them into absolute URLs and print it (by passing in page content as input):  
