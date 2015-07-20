@@ -1,4 +1,4 @@
-## Webb - Web Scrapper and Crawler
+## Webb - Web Scrapper and Crawler Library
 An all-in-one Python library to scrap, parse and crawl web pages
 
 ### Gist
