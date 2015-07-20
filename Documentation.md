@@ -31,6 +31,9 @@ The library needs to be imported into the Python code. You can import the librar
 * Get IP address of a webpage:  
 `print(webb.get_ip("your-web-page-url"))`
 
+* Or Save the IP address into a variable (for later usage):  
+`ip = webb.get_ip("your-web-page-url")`
+
 ### Normalize a Web Page
 * Remove/Clean All HTML tags from Web Page:  
 `print(webb.clean_html_tags("your-web-page"))`
