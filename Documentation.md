@@ -25,6 +25,9 @@ The library needs to be imported into the Python code. You can import the librar
 * Traceroute a URL:  
 `webb.traceroute("your-web-page-url")`
 
+* Traceroute a URL and store the result (log) in the text file:  
+`webb.traceroute("your-web-page-url",'file-name.txt')`
+
 * Get IP address of a webpage:  
 `webb.get_ip("your-web-page-url")`
 
