@@ -18,11 +18,11 @@ except ImportError:
 #Get IP of a website from the URL
 def get_ip(url):
     ip = socket.gethostbyname(url)
-    print(ip)
+    return ip
     
     
 #Traceroute to a website
-def traceroute(url):
+def traceroute(url,*arg):
     while True:
         if 'http' not in url:
             url = "http://" + url
@@ -38,6 +38,10 @@ def traceroute(url):
     while True:
         line = p.stdout.readline()
         line2 = str(line).replace('\\r','').replace('\\n','')
+        if len(arg)>0:
+            file = open(arg[0], "a")
+            file.write(line2)
+            file.close()
         print(line2)
         if not line:
             break
