@@ -29,7 +29,7 @@ The library needs to be imported into the Python code. You can import the librar
 `webb.traceroute("your-web-page-url",'file-name.txt')`
 
 * Get IP address of a webpage:  
-`webb.get_ip("your-web-page-url")`
+`print(webb.get_ip("your-web-page-url"))`
 
 ### Normalize a Web Page
 * Remove/Clean All HTML tags from Web Page:  
