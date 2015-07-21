@@ -685,7 +685,15 @@ def download_google_images(*arg):
 
 #Clean HTML Tags
 def clean_html_tags(page):
-    pure_text = (re.sub(r'<.+?>', '', page)).replace('\n', ',')
+    while True:
+        script_start = page.find("<script")
+        script_end = page.find("</script>")
+        if '<script' in page:
+            script_section = page[script_start:script_end+9]
+            page = page.replace(script_section,'')
+        else:
+            break
+    pure_text = (re.sub(r'<.+?>', '', page))#.replace('\n', '')
     return pure_text
 
 ########## End ##########
