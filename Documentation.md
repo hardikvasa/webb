@@ -42,7 +42,7 @@ The library needs to be imported into the Python code. You can import the librar
 `page = webb.download_page("your-web-page-url")`
 
 ### Normalize a Web Page
-* Remove/Clean All HTML tags from Web Page:  
+* Remove/Clean All HTML tags from Web Page (Also deletes everything between the 'script' tagg, including the tags):  
 `print(webb.clean_html_tags("your-web-page"))`
 
 ### Normalize Web Page URL
