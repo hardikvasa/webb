@@ -34,13 +34,16 @@ The library needs to be imported into the Python code. You can import the librar
 * Or Save the IP address into a variable (for later usage):  
 `ip = webb.get_ip("your-web-page-url")`
 
+### Downloading HTML Web Page
+* Download entire HTML page and print it:  
+`print(webb.download_page("your-web-page-url"))`
+
+* Download entire HTML page and store it in a variable for future use:  
+`page = webb.download_page("your-web-page-url")`
+
 ### Normalize a Web Page
 * Remove/Clean All HTML tags from Web Page:  
 `print(webb.clean_html_tags("your-web-page"))`
-
-### Downloading HTML Web Page
-* Download entire HTML page:  
-`print(webb.download_page("your-web-page-url"))`
 
 ### Normalize Web Page URL
 * Normalize URL (Convert Relative URL to absolute URL):  
