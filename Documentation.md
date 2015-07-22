@@ -34,6 +34,9 @@ The library needs to be imported into the Python code. You can import the librar
 * Or Save the IP address into a variable (for later usage):  
 `ip = webb.get_ip("your-web-page-url")`
 
+* Get the Whois data of a website :  
+`print(webb.get_whois_data("your-web-page-url"))`
+
 ### Downloading HTML Web Page
 * Download entire HTML page and print it:  
 `print(webb.download_page("your-web-page-url"))`
