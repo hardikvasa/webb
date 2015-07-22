@@ -44,6 +44,9 @@ The library needs to be imported into the Python code. You can import the librar
 * Download entire HTML page and store it in a variable for future use:  
 `page = webb.download_page("your-web-page-url")`
 
+* Download entire HTML page and save it in a text file:  
+`print(webb.download_page("your-web-page-url","file-name.txt"))`
+
 ### Normalize a Web Page
 * Remove/Clean All HTML tags from Web Page (Also deletes everything between the 'script' tagg, including the tags):  
 `print(webb.clean_html_tags("your-web-page"))`
