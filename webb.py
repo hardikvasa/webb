@@ -50,7 +50,7 @@ def traceroute(url,*arg):
 
 ###### Download HTML Page Main Function ######                
 #Downloading entire Web Document (Raw Page Content) for the crawler
-def download_page(url):
+def download_page(url,*arg):
     version = (3,0)
     cur_version = sys.version_info
     if cur_version >= version:     #If the Current Version of Python is 3.0 or above
@@ -60,8 +60,14 @@ def download_page(url):
             headers['User-Agent'] = "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
             req = urllib.request.Request(url, headers = headers)
             resp = urllib.request.urlopen(req)
-            respData = str(resp.read())
-            return respData
+            page = str(resp.read())
+            if len(arg)>0:
+                file = open(arg[0], "w")
+                file.write(page)
+                file.close()
+                return page
+            else:
+                return page
         except Exception as e:
             print(str(e))
     else:                        #If the Current Version of Python is 2.x
@@ -72,7 +78,13 @@ def download_page(url):
             req = urllib2.Request(url, headers = headers)
             response = urllib2.urlopen(req)
             page = response.read()
-            return page    
+            if len(arg)>0:
+                file = open(arg[0], "w")
+                file.write(page)
+                file.close()
+                return page
+            else:
+                return page    
         except:
             return"Page Not found"
 
@@ -698,7 +710,7 @@ def clean_html_tags(page):
     return pure_text
 
 
-############## Download Whoid Database Record ############
+
 #Perform a generic whois query to a server and get the reply
 def perform_whois(server , query) :
     #socket connection
@@ -759,3 +771,4 @@ def get_whois_data(domain):
      
     return msg
 ########## End ##########
+
