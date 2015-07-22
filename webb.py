@@ -12,6 +12,7 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+###### End of Import ######
 
 
 ###### Web Site Information ######   
@@ -696,4 +697,65 @@ def clean_html_tags(page):
     pure_text = (re.sub(r'<.+?>', '', page))#.replace('\n', '')
     return pure_text
 
+
+############## Download Whoid Database Record ############
+#Perform a generic whois query to a server and get the reply
+def perform_whois(server , query) :
+    #socket connection
+    s = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
+    s.connect((server , 43))
+     
+    s.send(query + '\r\n')  #send data
+     
+    message = ''        #receive reply
+    while len(message) < 10000:
+        raw = s.recv(100)
+        if(raw == ''):
+            break
+        message = message + raw
+     
+    return message
+ 
+#Function to perform the whois on a domain name
+def get_whois_data(domain):
+    #remove scheme(http) and 'www'
+    domain = domain.replace('http://','')
+    domain = domain.replace('www.','')
+     
+    #get the extension , .com , .org , .edu
+    ext = domain[-3:]
+     
+    #If top level domain .com .org .net
+    if(ext == 'com' or ext == 'org' or ext == 'net'):
+        whois = 'whois.internic.net'
+        msg = perform_whois(whois , domain)
+         
+        #Now scan the reply for the whois server
+        lines = msg.splitlines()
+        for line in lines:
+            if ':' in line:
+                words = line.split(':')
+                if  'Whois' in words[0] and 'whois.' in words[1]:
+                    whois = words[1].strip()
+                    break;
+     
+    #Or Regional/Country level - contact whois.iana.org to find the whois server of a particular TLD
+    else:
+        #Break again like , co.in to in
+        ext = domain.split('.')[-1]
+         
+        whois = 'whois.iana.org'  #Give the Whois server for the particular country
+        msg = perform_whois(whois , ext)
+         
+        lines = msg.splitlines()   #Get the reply for a whois server
+        for line in lines:
+            if ':' in line:
+                words = line.split(':')
+                if 'whois.' in words[1] and 'Whois Server (port 43)' in words[0]:
+                    whois = words[1].strip()
+                    break;
+     
+    msg = perform_whois(whois , domain) #Get reply from the final whois server
+     
+    return msg
 ########## End ##########
