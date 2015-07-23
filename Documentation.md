@@ -111,7 +111,7 @@ The library needs to be imported into the Python code. You can import the librar
 * Clean an HTML page by removing all the HTML tags:  
 `print(webb.pure_text("your-web-page"))`
 
-### Crawl Web pages in a systematic manner
+### Crawling the Web
 * Crawl web pages in breathe-first manner (Out-of-domain mode):  
 `webb.web_crawl("your-web-page-url")`
 
