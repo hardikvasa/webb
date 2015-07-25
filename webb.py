@@ -23,12 +23,12 @@ def get_ip(url):
     
     
 #Traceroute to a website
-def traceroute(url,*arg):
+def traceroute(url, *arg):
     while True:
-        if 'http' not in url:
+        if not url.startswith('http'):
             url = "http://" + url
         elif "www" not in url:
-            url = "www."[:7] + url[7:]
+            url = "www." + url[7:]
         else:
             url = url
             break
@@ -39,7 +39,7 @@ def traceroute(url,*arg):
     while True:
         line = p.stdout.readline()
         line2 = str(line).replace('\\r','').replace('\\n','')
-        if len(arg)>0:
+        if len(arg) > 0:
             file = open(arg[0], "a")
             file.write(line2)
             file.close()
@@ -86,7 +86,7 @@ def download_page(url,*arg):
             else:
                 return page    
         except:
-            return"Page Not found"
+            return "Page Not found"
 
 
 
@@ -105,16 +105,14 @@ def title(url):
 #Check for URL extension so crawler does not crawl images and text files
 def extension_scan(url):
     a = ['.png','.jpg','.jpeg','.gif','.tif','.txt']
-    j = 0
-    while j < (len(a)):
-        if a[j] in url:
+    for ext in a:
+        if url.endswith(ext):
             #print("There!")
             flag2 = 1
             break
         else:
             #print("Not There!")
             flag2 = 0
-            j = j+1
     #print(flag2)
     return flag2
 
@@ -127,7 +125,7 @@ def url_normalize(url,seed_page):
     seed_page = seed_page.lower()       #Make it lower case
     t = urlparse(seed_page)     #parse the seed page (reference page)
     i = 0
-    while i<=7:
+    while i <= 7:
         if url == "/":
             url = seed_page
             flag = 0  
@@ -196,10 +194,10 @@ def find_all_links_as_list(page):
 
 #Get all the links from the find_all_links_as_list function and print it in order for users
 def find_all_links(*arg):
-    if arg[1] == 'url' or arg[1] == 'link':
+    if arg[1] in ('url', 'link'):
         url = arg[0]
         while True:
-            if "http" not in url:
+            if not url.startswith("http"):
                 url = "http://" + url
             elif "www" not in url:
                 url = "www."[:7] + url[7:]
@@ -211,7 +209,7 @@ def find_all_links(*arg):
         lists = find_all_links_as_list(page)
         if len(arg)>2:
             if arg[2] == "absolute":
-                if len(arg)>3:
+                if len(arg) > 3:
                     if arg[3] == 'list':
                         i = 0
                         while i < len(lists):
@@ -232,10 +230,10 @@ def find_all_links(*arg):
     elif arg[1] == 'content':
         page = arg[0]
         lists = find_all_links_as_list(page)
-        if len(arg)>2:
+        if len(arg) > 2:
             if arg[2] == "absolute":
                 seed_page = arg[3]
-                if len(arg)>4:
+                if len(arg) > 4:
                     if arg[4] == 'list':
                         i = 0
                         while i < len(lists):
@@ -591,7 +589,7 @@ def get_all_images(*arg):
         seed_page = s.scheme+'://'+s.netloc
         i = 0
         while i<len(links):
-            link,flag = url_parse(links[i],seed_page)
+            link, flag = url_parse(links[i],seed_page)
             print("downloading --> "+link)
             try:
                 file = urllib.URLopener()
@@ -715,7 +713,7 @@ def clean_html_tags(page):
 def perform_whois(server , query) :
     #socket connection
     s = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-    s.connect((server , 43))
+    s.connect((server, 43))
      
     s.send(query + '\r\n')  #send data
      
@@ -765,9 +763,9 @@ def get_whois_data(domain):
                 words = line.split(':')
                 if 'whois.' in words[1] and 'Whois Server (port 43)' in words[0]:
                     whois = words[1].strip()
-                    break;
+                    break
      
-    msg = perform_whois(whois , domain) #Get reply from the final whois server
+    msg = perform_whois(whois, domain) #Get reply from the final whois server
      
     return msg
 ########## End ##########
