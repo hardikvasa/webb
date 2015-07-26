@@ -770,6 +770,61 @@ def get_whois_data(domain):
     msg = perform_whois(whois , domain) #Get reply from the final whois server
      
     return msg
+
+
+
+def save_wikipedia_article(url,*arg):
+    raw_page = download_page(url)
+    start_heading = raw_page.find('<h1 id="firstHeading"')
+    end_start_heading = raw_page.find('>',start_heading+1)
+    end_heading = raw_page.find('</h1>',end_start_heading+1)
+    heading = raw_page[end_start_heading+1:end_heading]
+    page = heading + '\n\n'
+    raw_page = raw_page[end_heading+5:]
+    para_count = 0      #Initiate Para Count
+    while True:
+        find_paragraph = raw_page.find('<p>')
+        find_heading = raw_page.find('<span class="mw-headline"')
+        if find_paragraph == -1 or find_heading == -1:
+            break
+        else: 
+            if find_paragraph < find_heading:
+                #extract paragraph
+                start_paragraph = raw_page.find('<p>')
+                end_paragraph = raw_page.find('</p>',start_paragraph+1)
+                paragraph_raw = raw_page[start_paragraph+3:end_paragraph]
+                #remove HTML tags
+                paragraph_2 = (re.sub(r'<.+?>', '', paragraph_raw))
+                #remove citations
+                paragraph = (re.sub(r'\[.*?\]', '', paragraph_2))
+                #update paragraph count
+                para_count += 1
+                #add paragraph to the 'page'
+                if para_count < 2:
+                    page = page + '\n' + paragraph
+                else:
+                    page = page + '\n\n' + paragraph
+                #reduce the raw_page size
+                raw_page = raw_page[end_paragraph:]
+            else:
+                #extract heading
+                start_heading = raw_page.find('<span class="mw-headline"')
+                end_start_heading = raw_page.find('>',start_heading+1)
+                end_heading = raw_page.find('</span>',start_heading+1)
+                heading_raw = raw_page[end_start_heading+1:end_heading]
+                #remove HTML tags
+                heading = (re.sub(r'<.+?>', '', heading_raw))#.replace('\n', '')
+                #Since heading appeared, reset the para count
+                para_count = 0
+                #add heading to the 'page'
+                page = page + '\n\n' + heading + ':'
+                #reduce the raw_page size
+                raw_page = raw_page[end_heading:]
+    if len(arg)>0:
+        file = open(arg[0],'w')
+        file.write(page)
+        file.close()
+        return page
+    else:
+        return page
 ########## End ##########
-
-
