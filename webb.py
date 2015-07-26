@@ -97,7 +97,7 @@ def title(url):
     end_start_title = page.find(">",start_title+1)
     stop_title = page.find("</title>", end_start_title + 1)
     title = page[end_start_title + 1 : stop_title]
-    print (title)
+    return (title)
 
 
  
@@ -772,7 +772,7 @@ def get_whois_data(domain):
     return msg
 
 
-
+#Save Wikipedia Articles (only the text of the article)
 def save_wikipedia_article(url,*arg):
     raw_page = download_page(url)
     start_heading = raw_page.find('<h1 id="firstHeading"')
