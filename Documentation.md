@@ -136,3 +136,11 @@ The library needs to be imported into the Python code. You can import the librar
 
 * Download Google Images from keywords to local hard drive:  
 `webb.download_google_images('keyword','download')`
+
+### Save Wikipedia Articles
+* Extract only the 'text' from a Wikipedia article and display it:  
+`print(webb.save_wikipedia_article("wikipedia-article-link"))`
+
+* Extract only the 'text' from a Wikipedia article and save it in a Text file:  
+`print(webb.save_wikipedia_article("wikipedia-article-link",'file-name.txt'))`
+
