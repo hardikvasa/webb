@@ -36,5 +36,5 @@ setup(name='webb',
       license=__license__,
       url='https://github.com/hardikvasa/webb',
       py_modules=['webb'],
-      scripts=['webb.py'], # Added webb.py as script for backward compatibility
+      scripts=['webb/webb.py'], # Added webb.py as script for backward compatibility
     )
