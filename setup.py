@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 #
-# Copyright 2012 BloomReach, Inc.
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -22,19 +20,19 @@ Super S3 command line tool, setup.py
 
 from setuptools import setup, find_packages
 
-__author__ = "Hardik Vasa"
-__copyright__ = "Copyright 2015 @Z Series Innovations"
-__license__ = "http://www.apache.org/licenses/LICENSE-2.0"
-__version__ = "0.9"
-__maintainer__ = __author__
-__status__ = "Development"
 
-setup(name='webb',
-      version=__version__,
+setup(
+      name='webb',
+      version=0.9,
       description='An all-in-one Web Crawler, Web Parser and Web Scrapping library!',
-      author=__author__,
-      license=__license__,
+      author='Hardik Vasa',
+      maintainer='Hardik Vasa',
+      author_email='hnvasa@gmail.com',
+      description='An all-in-one Web Crawler, Web Parser and Web Scrapping library!',
+      long_description = read('README.md'),
+      license= "Apache License, Version 2.0",
       url='https://github.com/hardikvasa/webb',
+      status='Development',
       py_modules=['webb'],
-      scripts=['webb/webb.py'], # Added webb.py as script for backward compatibility
-    )
+      scripts=['webb/webb.py'],
+      )
