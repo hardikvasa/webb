@@ -827,4 +827,120 @@ def save_wikipedia_article(url,*arg):
         return page
     else:
         return page
+    
+    
+
+###### Wikipedia Crawler
+#Check for file type in URL so crawler does not crawl images and text files
+def wikipedia_extension_scan(url):
+    a = ['.png','.jpg','.jpeg','.gif','.tif','.txt','.svg']
+    j = 0
+    while j < (len(a)):
+        if a[j] in url:
+            flag2 = 1
+            break
+        else:
+            flag2 = 0
+            j = j+1
+    return flag2
+
+
+#URL parsing for incomplete or duplicate URLs
+def wikipedia_url_parse(url):
+    seed_page = "https://en.wikipedia.org"  #Crawling the English Wikipedia
+    try:
+        from urllib.parse import urlparse
+    except ImportError:
+        from urlparse import urlparse
+    url = url  #.lower()    #Make it lower case
+    s = urlparse(url)       #parse the given url
+    seed_page_n = seed_page #.lower()       #Make it lower case
+    #t = urlparse(seed_page_n)     #parse the seed page (reference page)
+    i = 0
+    flag = 0
+    while i<=9:
+        if url == "/":
+            url = seed_page_n
+            flag = 0  
+        elif not s.scheme:
+            url = "http://" + url
+            flag = 0
+        elif "#" in url:
+            url = url[:url.find("#")]
+            flag = 0
+        elif "?" in url:
+            url = url[:url.find("?")]
+            flag = 0
+        elif s.netloc == "":
+            url = seed_page + s.path
+            flag = 0    
+        elif url[len(url)-1] == "/":
+            url = url[:-1]
+            flag = 0
+        else:
+            url = url
+            flag = 0
+            break  
+        i = i+1
+        s = urlparse(url)   #Parse after every loop to update the values of url parameters
+    return(url, flag)
+
+
+#Main Crawl function that calls all the above function and crawls the entire site sequentially
+def wikipedia_crawl(starting_page,*arg):  
+    to_crawl = [starting_page]      #Define list name 'Seed Page'
+    crawled=[]      #Define list name 'Seed Page'
+    i=0        #Initiate Variable to count No. of Iterations
+    while i<arg[0]:     #Continue Looping till the 'to_crawl' list is not empty
+        urll = to_crawl.pop(0)      #If there are elements in to_crawl then pop out the first element
+        urll,flag = wikipedia_url_parse(urll)
+        #print(urll)
+        flag2 = wikipedia_extension_scan(urll)
+        time.sleep(1)
+        
+        #If flag = 1, then the URL is outside the seed domain URL
+        if flag == 1 or flag2 == 1:
+            pass        #Do Nothing
+            
+        else:       
+            if urll in crawled:     #Else check if the URL is already crawled
+                pass        #Do Nothing
+            else:       #If the URL is not already crawled, then crawl i and extract all the links from it
+                raw_html = download_page(urll)
+                #print(raw_html)
+                
+                start_heading = raw_html.find('<h1 id="firstHeading"')
+                end_start_heading = raw_html.find('>',start_heading+1)
+                end_heading = raw_html.find('</h1>',end_start_heading+1)
+                heading = raw_html[end_start_heading+1:end_heading]
+                heading = heading.replace('<i>', '').replace('</i>','')
+                
+                print("Title = " + heading)
+                print("Link = " + urll)                   
+                to_crawl = to_crawl + get_all_links(raw_html)
+                if len(to_crawl)>1000:
+                    to_crawl = to_crawl[:999]
+                crawled.append(urll)
+                                
+                #Remove duplicated from to_crawl
+                n = 1
+                j = 0
+                #k = 0
+                while j < (len(to_crawl)-n):
+                    if to_crawl[j] in to_crawl[j+1:(len(to_crawl)-1)]:
+                        to_crawl.pop(j)
+                        n = n+1
+                    else:
+                        pass     #Do Nothing
+                    j = j+1
+            i=i+1
+            print("Iteration No. = " + str(i) + ' | ' + "To Crawl = " + str(len(to_crawl)) + ' | ' + "Crawled = " + str(len(crawled)) + '\n')
+            #Writing the output data into a text file
+            if len(arg)>1:
+                file = open(arg[1], 'a')        #Open the text file called database.txt
+                file.write("Title = " + heading + "\n")         #Write the title of the page
+                file.write("Link = " + urll + "\n")
+                file.write("Iteration No. = " + str(i) + ' | ' + "To Crawl = " + str(len(to_crawl)) + ' | ' + "Crawled = " + str(len(crawled)) + '\n\n')
+                file.close()                            #Close the file
+    return ""
 ########## End ##########
