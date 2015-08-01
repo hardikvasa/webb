@@ -7,7 +7,7 @@ This is a light-weight, dynamic and highly-flexible Python library. It can be us
 ### Usage and Instructions
 For usage and instructions please visit the [Official Documentation](docs/Documentation.md)
 
-For issues and discussion visit the [Issue Tracker](issues)
+For issues and discussion visit the [Issue Tracker](https://github.com/hardikvasa/webb/issues)
 
 For sample codes and examples, please visit [Examples Codes](examples)
 
