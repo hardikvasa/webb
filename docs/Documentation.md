@@ -144,3 +144,9 @@ The library needs to be imported into the Python code. You can import the librar
 * Extract only the 'text' from a Wikipedia article and save it in a Text file:  
 `print(webb.save_wikipedia_article("wikipedia-article-link",'file-name.txt'))`
 
+### Wikipedia Crawler
+* Crawl Wikipedia Pages by giving the starting page and number of articles (pages) to crawl as arguments:  
+`print(webb.wikipedia_crawl('starting-wikipedia-page-link',number-of-pages-to-crawl))`
+
+* Crawl Wikipedia Pages and save it to a file by giving the starting page, number of articles (pages) to crawl and file name as arguments: 
+`print(webb.wikipedia_crawl('starting-wikipedia-page-link',number-of-pages-to-crawl,'file-name.txt'))`
