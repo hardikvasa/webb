@@ -2,10 +2,12 @@
 An all-in-one Python library to scrap, parse and crawl web pages
 
 ### Gist
-This is a light-weight, dynamic and highly-flexible Python library. It can be used to **crawl, download, index, parse, scrap and analyze web pages** in a systematic manner or any of the individual function. It is also used to **clean web pages, store web data and import/export relevant components** from the internet. Some of the other features also include **downloading google images and spidering wikipedia articles**.
+This is a light-weight, dynamic and highly-flexible Python library. It can be used to **crawl, download, index, parse, scrap and analyze web pages** in a systematic manner or any of the individual function. It is also used to **clean web pages, store web data** and **import/export relevant components** from the web. Some of the other features also include **downloading google images and spidering wikipedia articles**.
 
 ### Usage and Instructions
-For usage and instructions please visit the [Official Documentation](Documentation.md)
+For usage and instructions please visit the [Official Documentation](docs/Documentation.md)
+
+For issues and discussion visit the [Issue Tracker](issues)
 
 For sample codes and examples, please visit [Examples Codes](examples)
 
