@@ -24,14 +24,10 @@ def get_ip(url):
     
 #Traceroute to a website
 def traceroute(url,*arg):
-    while True:
-        if 'http' not in url:
-            url = "http://" + url
-        elif "www" not in url:
-            url = "www."[:7] + url[7:]
-        else:
-            url = url
-            break
+    if "www" not in url:
+        url = "www." + url
+    if "http" not in url:
+        url = "http://" + url
     url = urlparse(url) 
     url = url.netloc
     print(url)        
@@ -105,18 +101,12 @@ def title(url):
 #Check for URL extension so crawler does not crawl images and text files
 def extension_scan(url):
     a = ['.png','.jpg','.jpeg','.gif','.tif','.txt']
-    j = 0
-    while j < (len(a)):
-        if a[j] in url:
-            #print("There!")
-            flag2 = 1
-            break
-        else:
-            #print("Not There!")
-            flag2 = 0
-            j = j+1
-    #print(flag2)
-    return flag2
+    
+    for ext in a:
+        if ext in url:
+            return 1
+    return 0
+    
 
 
 ###### URL Normalizer for the Users ######
