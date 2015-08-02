@@ -9,10 +9,6 @@ This is a official documentation of the **webb** library in Python
 
 **or**
 
-`python -m pip install webb`
-
-**or**
-
 `python install setup.py` (for windows users using command prompt)
 
 ## 2. Import the Library
@@ -36,6 +32,9 @@ The library needs to be imported into the Python code. You can import the librar
 
 * Get the Whois data of a website :  
 `print(webb.get_whois_data("your-web-page-url"))`
+
+* Ping a website (ICMP Ping):  
+`print(webb.ping('your-web-page-url'))`
 
 ### Downloading HTML Web Page
 * Download entire HTML page and print it:  
