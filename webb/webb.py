@@ -6,6 +6,7 @@
 import time     #For Delay calculations
 import sys    #for system related information
 from subprocess import Popen, PIPE
+import subprocess
 import re
 import socket
 try:
@@ -47,6 +48,18 @@ def traceroute(url,*arg):
         if not line:
             break
         
+
+
+def ping(host):
+    ping = subprocess.Popen(
+        ["ping", "-v", "4", host],
+        stdout = subprocess.PIPE,
+        stderr = subprocess.PIPE
+    )
+    
+    out, error = ping.communicate()
+    return out
+
 
 ###### Download HTML Page Main Function ######                
 #Downloading entire Web Document (Raw Page Content) for the crawler
