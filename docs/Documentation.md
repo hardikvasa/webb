@@ -2,14 +2,22 @@
 This is a official documentation of the **webb** library in Python
 
 ## 1. Download and Install
+
+`pip install webb`
+
+**or**
+
+Download the complete zip file from github, unzip it and then type the following command
+ 
+`python install setup.py` (for windows users using command prompt)
+
+**or**
+
 1. Download `webb.py`
 2. Create a new file in the same folder and give it any name like `main.py`
 3. Import the webb library by writing `import webb` in the `main.py` file
 4. Once this is done, use any of the following commands
 
-**or**
-
-`python install setup.py` (for windows users using command prompt)
 
 ## 2. Import the Library
 The library needs to be imported into the Python code. You can import the library by typing in the following command at the top of your codde:
