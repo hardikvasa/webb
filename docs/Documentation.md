@@ -1,15 +1,14 @@
 # Webb Documentation
 This is a official documentation of the **webb** library in Python
 
-## 1. Download and Install
+## **Step 1.** Download/Install the Library
 
 `pip install webb`
 
 **or**
 
-Download the complete zip file from github, unzip it and then type the following command
- 
-`python install setup.py` (for windows users using command prompt)
+Download the complete zip file from github, unzip it and then inside the directory type the following command from your command prompt or terminal
+`python install setup.py`
 
 **or**
 
@@ -19,12 +18,12 @@ Download the complete zip file from github, unzip it and then type the following
 4. Once this is done, use any of the following commands
 
 
-## 2. Import the Library
+## **Step 2.** Import the Library in your code
 The library needs to be imported into the Python code. You can import the library by typing in the following command at the top of your codde:
 
-`import webb`
+`from webb import webb`
 
-## 3. Commands
+## **Step 3.** Use Commands
 ### Web Site Information
 * Traceroute a URL:  
 `webb.traceroute("your-web-page-url")`
