@@ -5,4 +5,3 @@ webb.egg-info
 dist
 build
 MANIFEST.in
-*.pyc
