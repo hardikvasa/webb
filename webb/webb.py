@@ -1,6 +1,7 @@
-# Version 0.9
+#
 # Under Apache License Version 2.0
 # @Hardik Vasa
+#
 
 #Import Libraries
 import time     #For Delay calculations
@@ -13,22 +14,44 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+try:
+    import urllib.request       #Python 3.x
+except ImportError:
+    import urllib2      #Python 2.x
 ###### End of Import ######
 
 
-###### Web Site Information ######   
-#Get IP of a website from the URL
+   
+###### Get IP of a website from the URL ######
 def get_ip(url):
     ip = socket.gethostbyname(url)
     return ip
     
+
+
+###### Ping we Website (ICMP Ping) ######
+def ping(host):
+    ping = subprocess.Popen(
+        ["ping", "-v", "4", host],
+        stdout = subprocess.PIPE,
+        stderr = subprocess.PIPE
+    )
     
-#Traceroute to a website
+    out, error = ping.communicate()
+    return out
+
+
+
+###### Traceroute to a website ######
 def traceroute(url,*arg):
-    if "www" not in url:
-        url = "www." + url
-    if "http" not in url:
-        url = "http://" + url
+    while True:
+        if 'http' not in url:
+            url = "http://" + url
+        elif "www" not in url:
+            url = "www."[:7] + url[7:]
+        else:
+            url = url
+            break
     url = urlparse(url) 
     url = url.netloc
     print(url)        
@@ -46,15 +69,67 @@ def traceroute(url,*arg):
         
 
 
-def ping(host):
-    ping = subprocess.Popen(
-        ["ping", "-v", "4", host],
-        stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE
-    )
-    
-    out, error = ping.communicate()
-    return out
+###### WHOIS Lookup ######
+#Perform a generic whois query to a server and get the reply
+def perform_whois(server , query) :
+    #socket connection
+    s = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
+    s.connect((server , 43))
+     
+    s.send(query + '\r\n')  #send data
+     
+    message = ''        #receive reply
+    while len(message) < 10000:
+        raw = s.recv(100)
+        if(raw == ''):
+            break
+        message = message + raw
+     
+    return message
+
+#Function to perform the whois on a domain name
+def get_whois_data(domain):
+    #remove scheme(http) and 'www'
+    domain = domain.replace('http://','')
+    domain = domain.replace('www.','')
+     
+    #get the extension , .com , .org , .edu
+    ext = domain[-3:]
+     
+    #If top level domain .com .org .net
+    if(ext == 'com' or ext == 'org' or ext == 'net'):
+        whois = 'whois.internic.net'
+        msg = perform_whois(whois , domain)
+         
+        #Now scan the reply for the whois server
+        lines = msg.splitlines()
+        for line in lines:
+            if ':' in line:
+                words = line.split(':')
+                if  'Whois' in words[0] and 'whois.' in words[1]:
+                    whois = words[1].strip()
+                    break;
+     
+    #Or Regional/Country level - contact whois.iana.org to find the whois server of a particular TLD
+    else:
+        #Break again like , co.in to in
+        ext = domain.split('.')[-1]
+         
+        whois = 'whois.iana.org'  #Give the Whois server for the particular country
+        msg = perform_whois(whois , ext)
+         
+        lines = msg.splitlines()   #Get the reply for a whois server
+        for line in lines:
+            if ':' in line:
+                words = line.split(':')
+                if 'whois.' in words[1] and 'Whois Server (port 43)' in words[0]:
+                    whois = words[1].strip()
+                    break;
+     
+    msg = perform_whois(whois , domain) #Get reply from the final whois server
+     
+    return msg
+
 
 
 ###### Download HTML Page Main Function ######                
@@ -63,7 +138,6 @@ def download_page(url,*arg):
     version = (3,0)
     cur_version = sys.version_info
     if cur_version >= version:     #If the Current Version of Python is 3.0 or above
-        import urllib.request    #urllib library for Extracting web pages
         try:
             headers = {}
             headers['User-Agent'] = "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
@@ -80,7 +154,6 @@ def download_page(url,*arg):
         except Exception as e:
             print(str(e))
     else:                        #If the Current Version of Python is 2.x
-        import urllib2
         try:
             headers = {}
             headers['User-Agent'] = "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
@@ -99,8 +172,8 @@ def download_page(url,*arg):
 
 
 
-#Extract the title tag
-def title(url):
+###### Extract the title tag ######
+def page_title(url):
     page = download_page(url)
     start_title = page.find("<title")
     end_start_title = page.find(">",start_title+1)
@@ -109,17 +182,21 @@ def title(url):
     return (title)
 
 
- 
 
-#Check for URL extension so crawler does not crawl images and text files
+###### Check for URL extension so crawler discards non-html pages ######
 def extension_scan(url):
-    a = ['.png','.jpg','.jpeg','.gif','.tif','.txt']
-    
-    for ext in a:
-        if ext in url:
-            return 1
-    return 0
-    
+    a = ['.png','.jpg','.jpeg','.gif','.tif','.txt','.svg','.pdf']
+    j = 0
+    while j < (len(a)):
+        if a[j] in url:
+            flag2 = 1
+            break
+        else:
+            flag2 = 0
+            j = j+1
+    #print(flag2)
+    return flag2
+
 
 
 ###### URL Normalizer for the Users ######
@@ -129,42 +206,49 @@ def url_normalize(url,seed_page):
     s = urlparse(url)       #parse the given url
     seed_page = seed_page.lower()       #Make it lower case
     t = urlparse(seed_page)     #parse the seed page (reference page)
-    i = 0
-    while i<=7:
-        if url == "/":
-            url = seed_page
-            flag = 0  
-        elif not s.scheme:
-            url = "http://" + url
+    flag = 0
+    if url == "/":
+        url = seed_page
+        flag = 0
+        print url  
+    if s.netloc == "":
+        path = url.find('/')
+        if path != -1:
+            url = url[path:]
+            url = seed_page + url
             flag = 0
-        elif "#" in url:
-            url = url[:url.find("#")]
-        elif "?" in url:
-            url = url[:url.find("?")]
-        elif s.netloc == "":
-            url = seed_page + s.path
-            flag = 0
-        elif "www" not in url:
-            url = "www."[:7] + url[7:]
-            flag = 0
-            
-        elif url[len(url)-1] == "/":
-            url = url[:-1]
-            flag = 0
-        elif s.netloc != t.netloc:
-            url = url
-            flag = 1
-            break        
+            s = urlparse(url)
         else:
             url = url
             flag = 0
-            break
-        i = i+1
-        s = urlparse(url)   #Parse after every loop to update the values of url parameters
+    if not s.scheme:
+        url = "http://" + url
+        flag = 0
+        s = urlparse(url)
+    if "#" in url:
+        url = url[:url.find("#")]
+    if "?" in url:
+        url = url[:url.find("?")]
+    if "www" not in url:
+        url = "www."[:7] + url[7:]
+        flag = 0
+        s = urlparse(url)
+    if 'http' not in url:
+        url = "http://" + url
+        flag = 0
+        s = urlparse(url)
+    if url[len(url)-1] == "/":
+        url = url[:-1]
+        flag = 0
+    if s.netloc != t.netloc:
+        s = urlparse(url)
+        url = url
+        flag = 1    
     if flag == 0:
         return url
     else:
         return "Invalid URL"
+
 
 
 ###### Find all the links function for users ######
@@ -180,10 +264,17 @@ def find_next_link(s):
         end_quote = s.find('"',start_quote+1)
         link = str(s[start_quote+1:end_quote])
         return link, end_quote
-          
 
 #Getting all links as list with the help of 'get_next_links' for users
-def find_all_links_as_list(page):
+def find_all_links(content):
+    if content.startswith('http') or content.startswith('www'):
+        url = content
+        if "http" not in url:
+            url = "http://" + url
+        if "www" not in url:
+            url = "www."[:7] + url[7:]
+        content = download_page(url)
+    page = content
     links = []
     while True:
         link, end_link = find_next_link(page)
@@ -195,99 +286,6 @@ def find_all_links_as_list(page):
             page = page[end_link:]
     return links 
 
-
-
-#Get all the links from the find_all_links_as_list function and print it in order for users
-def find_all_links(*arg):
-    if arg[1] == 'url' or arg[1] == 'link':
-        url = arg[0]
-        while True:
-            if "http" not in url:
-                url = "http://" + url
-            elif "www" not in url:
-                url = "www."[:7] + url[7:]
-            else:
-                break
-        t = urlparse(url)
-        seed_page = t.scheme+'://'+t.netloc
-        page = download_page(url)
-        lists = find_all_links_as_list(page)
-        if len(arg)>2:
-            if arg[2] == "absolute":
-                if len(arg)>3:
-                    if arg[3] == 'list':
-                        i = 0
-                        while i < len(lists):
-                            lists[i] = url_normalize(lists[i],seed_page)
-                            i = i+1
-                        return lists
-                else:
-                    for i in lists:
-                        i = url_normalize(i,seed_page)
-                        print(i)
-            elif arg[2] == "list":
-                return lists
-            else:
-                print("Invalid Third Argument")
-        else:    
-            for i in lists:
-                print(i)     
-    elif arg[1] == 'content':
-        page = arg[0]
-        lists = find_all_links_as_list(page)
-        if len(arg)>2:
-            if arg[2] == "absolute":
-                seed_page = arg[3]
-                if len(arg)>4:
-                    if arg[4] == 'list':
-                        i = 0
-                        while i < len(lists):
-                            lists[i] = url_normalize(lists[i],seed_page)
-                            i = i+1
-                        return lists
-                else:
-                    for i in lists:
-                        i = url_normalize(i,seed_page)
-                        print(i)
-            elif arg[2] == "list":
-                return lists
-            else:
-                print("Invalid Third Argument")
-        else:    
-            for i in lists:
-                print(i)
-    else:
-        page = 'no_links'
-
-
-
-###### Web Crawler Functions ######
-#Finding 'Next Link' on a given web page for crawler
-def get_next_link(s):
-    start_link = s.find("<a href")
-    if start_link == -1:    #If no links are found then give an error!
-        end_quote = 0
-        link = "no_links"
-        return link, end_quote
-    else:
-        start_quote = s.find('"', start_link)
-        end_quote = s.find('"',start_quote+1)
-        link = str(s[start_quote+1:end_quote])
-        return link, end_quote
-          
-
-#Getting all links with the help of 'get_next_links' for crawler
-def get_all_links(page):
-    links = []
-    while True:
-        link, end_link = get_next_link(page)
-        if link == "no_links":
-            break
-        else:
-            links.append(link)      #Append all the links in the list named 'Links'
-            #time.sleep(0.1)
-            page = page[end_link:]
-    return links
 
 
 
@@ -362,7 +360,7 @@ def web_crawl(*arg):
                     delay = arg[1]
                     time.sleep(delay)
                 #print(download_page(urll))
-                to_crawl = to_crawl + get_all_links(download_page(urll))
+                to_crawl = to_crawl + find_all_links(download_page(urll))
                 crawled.append(urll)
                 
                 #Remove duplicated from to_crawl
@@ -425,7 +423,7 @@ def web_crawl_in_domain(*arg):
                     delay = arg[1]
                     time.sleep(delay)
                 #print(download_page(urll))
-                to_crawl = to_crawl + get_all_links(download_page(urll))
+                to_crawl = to_crawl + find_all_links(download_page(urll))
                 crawled.append(urll)
                 
                 #Remove duplicated from to_crawl
@@ -457,11 +455,26 @@ def web_crawl_in_domain(*arg):
     return ''
 
 
+
 #Removing HTML tags from the content
-def pure_text(page):
+def remove_html_tags(page):
     pure_text = (re.sub(r'<.+?>', '', page))       #From '<' to the next '>'
     return pure_text
 
+
+
+#Clean HTML Tags
+def clean_page(page):
+    while True:
+        script_start = page.find("<script")
+        script_end = page.find("</script>")
+        if '<script' in page:
+            script_section = page[script_start:script_end+9]
+            page = page.replace(script_section,'')
+        else:
+            break
+    pure_text = (re.sub(r'<.+?>', '', page))#.replace('\n', '')
+    return pure_text
 
 
 
@@ -510,7 +523,6 @@ def get_all_headings(*arg):
 
 
 
-
 ###### Extract Paragraphs ######
 #Finding 'Next Paragraph' on a given web page for users
 def get_next_paragraph(s):
@@ -548,7 +560,6 @@ def get_all_paragraphs(url):
     lists = get_all_paragraphs_as_list(url)
     for i in lists:
         print(i)
-        
 
 
 
@@ -698,81 +709,6 @@ def download_google_images(*arg):
         else:
             pass
 
-
-#Clean HTML Tags
-def clean_html_tags(page):
-    while True:
-        script_start = page.find("<script")
-        script_end = page.find("</script>")
-        if '<script' in page:
-            script_section = page[script_start:script_end+9]
-            page = page.replace(script_section,'')
-        else:
-            break
-    pure_text = (re.sub(r'<.+?>', '', page))#.replace('\n', '')
-    return pure_text
-
-
-
-#Perform a generic whois query to a server and get the reply
-def perform_whois(server , query) :
-    #socket connection
-    s = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-    s.connect((server , 43))
-     
-    s.send(query + '\r\n')  #send data
-     
-    message = ''        #receive reply
-    while len(message) < 10000:
-        raw = s.recv(100)
-        if(raw == ''):
-            break
-        message = message + raw
-     
-    return message
- 
-#Function to perform the whois on a domain name
-def get_whois_data(domain):
-    #remove scheme(http) and 'www'
-    domain = domain.replace('http://','')
-    domain = domain.replace('www.','')
-     
-    #get the extension , .com , .org , .edu
-    ext = domain[-3:]
-     
-    #If top level domain .com .org .net
-    if(ext == 'com' or ext == 'org' or ext == 'net'):
-        whois = 'whois.internic.net'
-        msg = perform_whois(whois , domain)
-         
-        #Now scan the reply for the whois server
-        lines = msg.splitlines()
-        for line in lines:
-            if ':' in line:
-                words = line.split(':')
-                if  'Whois' in words[0] and 'whois.' in words[1]:
-                    whois = words[1].strip()
-                    break;
-     
-    #Or Regional/Country level - contact whois.iana.org to find the whois server of a particular TLD
-    else:
-        #Break again like , co.in to in
-        ext = domain.split('.')[-1]
-         
-        whois = 'whois.iana.org'  #Give the Whois server for the particular country
-        msg = perform_whois(whois , ext)
-         
-        lines = msg.splitlines()   #Get the reply for a whois server
-        for line in lines:
-            if ':' in line:
-                words = line.split(':')
-                if 'whois.' in words[1] and 'Whois Server (port 43)' in words[0]:
-                    whois = words[1].strip()
-                    break;
-     
-    msg = perform_whois(whois , domain) #Get reply from the final whois server
-     
-    return msg
 
 
 #Save Wikipedia Articles (only the text of the article)
