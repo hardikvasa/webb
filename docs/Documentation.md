@@ -47,15 +47,19 @@ The library needs to be imported into the Python code. You can import the librar
 * Download entire HTML page and print it:  
 `print(webb.download_page("your-web-page-url"))`
 
-* Download entire HTML page and store it in a variable for future use:  
+* Download entire HTML page and store it in a variable for further use:  
 `page = webb.download_page("your-web-page-url")`
 
 * Download entire HTML page and save it in a text file:  
 `print(webb.download_page("your-web-page-url","file-name.txt"))`
 
-### Normalize a Web Page
+### Normalize a Web Page (Remove HTML tags and everything between the script tags)
 * Remove/Clean All HTML tags from Web Page (Also deletes everything between the 'script' tagg, including the tags):  
-`print(webb.clean_html_tags("your-web-page"))`
+`print(webb.clean_page("your-web-page"))`
+
+### Removing all HTML tags from a web page
+* Clean an HTML page by removing all the HTML tags:  
+`print(webb.remove_html_tags("your-web-page"))`
 
 ### Normalize Web Page URL
 * Normalize URL (Convert Relative URL to absolute URL):  
@@ -63,34 +67,14 @@ The library needs to be imported into the Python code. You can import the librar
 
 ### Extracting Page Title
 * Print the page title:  
-`webb.title("your-web-page-url")`
+`webb.page_title("your-web-page-url")`
 
 ### Extracting Links (hyperlinks)
 * Find all the links in a web page and print it one below the other (by passing in URL as input):  
-`webb.find_all_links('your-web-page-url','link')`
-
-* Find all the links in a particular web page and print it as a list (by passing in URL as input):  
-`print(webb.find_all_links('your-web-page-url','link','list'))`
-
-* Find all the URLs in a page and convert them into absolute URLs and print it (by passing in URL as input):  
-`webb.find_all_links('your-web-page-url','link','absolute')`
-
-* Find all the URLs in a page and convert them into absolute URLs and print it as a list (by passing in URL as input):  
-`print(webb.find_all_links('www.zseries.in','link','absolute','list'))`
-
-----------
+`webb.find_all_links('your-web-page-url')`
 
 * Find all the links in a web page and print it one below the other (by passing in Page Content as input): 
-`webb.find_all_links(page,'content')`
-
-* Find all the links in a particular web page and print it as a list (by passing in Page Content as input):  
-`print(webb.find_all_links(page,'content','list'))`
-
-* Find all the URLs in a page and convert them into absolute URLs and print it (by passing in page content as input):  
-`webb.find_all_links('page-content','link','absolute','base-url')`
-
-* Find all the URLs in a page and convert them into absolute URLs and print it as a list (by passing in Page Content as input):  
-`print(webb.find_all_links(page,'content','absolute',url,'list'))`
+`webb.find_all_links('page-content')`
 
 ### Extracting Headings tags from a web page
 * Get all the headings (h1 or h2 or ... h6) from a given web page and print it one below the other:  
@@ -113,10 +97,6 @@ The library needs to be imported into the Python code. You can import the librar
 * Get links of all the images in a given web page and download all those images on local disk (computer):  
 `webb.get_all_images("your-web-page-url","download")`
 
-### Removing all HTML tags from a web page
-* Clean an HTML page by removing all the HTML tags:  
-`print(webb.pure_text("your-web-page"))`
-
 ### Crawling the Web
 * Crawl web pages in breathe-first manner (Out-of-domain mode):  
 `webb.web_crawl("your-web-page-url")`
@@ -126,6 +106,8 @@ The library needs to be imported into the Python code. You can import the librar
 
 * Crawl an entire website with no (0 seconds) delay while writing the crawl data into a log file (Out-of-domain mode):  
 `webb.web_crawl("your-web-page-url",0,"write_log")`
+
+----------
 
 * Crawl web pages in breathe-first manner (In-domain mode):  
 `webb.web_crawl_in_domain("your-web-page-url")`
