@@ -1,0 +1,11 @@
+MANIFEST.in
+README.md
+TODO.md
+setup.py
+webb/__init__.py
+webb/webb.py
+webb.egg-info/PKG-INFO
+webb.egg-info/SOURCES.txt
+webb.egg-info/dependency_links.txt
+webb.egg-info/not-zip-safe
+webb.egg-info/top_level.txt
