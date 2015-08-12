@@ -53,13 +53,12 @@ The library needs to be imported into the Python code. You can import the librar
 * Download entire HTML page and save it in a text file:  
 `print(webb.download_page("your-web-page-url","file-name.txt"))`
 
-### Normalize a Web Page (Remove HTML tags and everything between the script tags)
-* Remove/Clean All HTML tags from Web Page (Also deletes everything between the 'script' tagg, including the tags):  
-`print(webb.clean_page("your-web-page"))`
-
-### Removing all HTML tags from a web page
+### Clean/Prettify a Web Page
 * Clean an HTML page by removing all the HTML tags:  
 `print(webb.remove_html_tags("your-web-page"))`
+
+* Remove/Clean All HTML tags from a Web Page (Also deletes everything between the 'script' tagg, including the tags):  
+`print(webb.clean_page("your-web-page"))`
 
 ### Normalize Web Page URL
 * Normalize URL (Convert Relative URL to absolute URL):  
@@ -136,5 +135,5 @@ The library needs to be imported into the Python code. You can import the librar
 * Crawl Wikipedia Pages by giving the starting page and number of articles (pages) to crawl as arguments:  
 `print(webb.wikipedia_crawl('starting-wikipedia-page-link',number-of-pages-to-crawl))`
 
-* Crawl Wikipedia Pages and save it to a file by giving the starting page, number of articles (pages) to crawl and file name as arguments: 
+* Crawl Wikipedia Pages and save it to a file by giving the starting page, number of articles (pages) to crawl and file name as arguments:  
 `print(webb.wikipedia_crawl('starting-wikipedia-page-link',number-of-pages-to-crawl,'file-name.txt'))`
