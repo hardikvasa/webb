@@ -137,3 +137,7 @@ The library needs to be imported into the Python code. You can import the librar
 
 * Crawl Wikipedia Pages and save it to a file by giving the starting page, number of articles (pages) to crawl and file name as arguments:  
 `print(webb.wikipedia_crawl('starting-wikipedia-page-link',number-of-pages-to-crawl,'file-name.txt'))`
+
+### Google Search
+* Google Search using Python and get the results with the URLs (links):  
+`webb.google_search('search-query')`
