@@ -9,7 +9,9 @@ import sys    #for system related information
 from subprocess import Popen, PIPE
 import subprocess
 import re
+import json as m_json
 import socket
+import urllib
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -491,7 +493,6 @@ def get_next_heading(s,heading_type):
         end_quote = s.find('</'+heading_type+'>',start_quote+1)
         link = str(s[start_quote+1:end_quote])
         return link, end_quote
-          
 
 #Getting all headings with the help of 'get_next_headings' for users
 def get_all_headings_as_list(url,heading_type):
@@ -508,7 +509,6 @@ def get_all_headings_as_list(url,heading_type):
             #time.sleep(0.1)
             page = page[end_link:]
     return links 
-
 
 # Get all the headings from get_all_headings_as_list
 def get_all_headings(*arg):
@@ -536,8 +536,6 @@ def get_next_paragraph(s):
         end_quote = s.find('</p>',start_quote+1)
         link = str(s[start_quote+1:end_quote])
         return link, end_quote
-
-          
 
 #Getting all paragraphs with the help of 'get_next_paragraph_as_list' for users
 def get_all_paragraphs_as_list(url):
@@ -577,8 +575,6 @@ def get_next_images_link(s):
         link = str(s[start_link+5:end_link])
         return link, end_link
           
-
-
 #Getting all image links with the help of 'get_next_links' for get_all_images
 def get_all_images_links(url):
     page = download_page(url)
@@ -591,8 +587,6 @@ def get_all_images_links(url):
             links.append(link)      #Append all the links in the list named 'Links'
             page = page[end_link:]
     return links 
-
-
 
 #Download all images in hard disk
 def get_all_images(*arg):
@@ -615,7 +609,6 @@ def get_all_images(*arg):
             i = i+1
     else:
         pass
-    
 
 
 
@@ -648,9 +641,7 @@ def get_all_image_links(page):
             page = page[end_content:]
     return items
 
-
-
-#Download Image Links
+#Download Images
 def download_google_images(*arg):
     import urllib
     search_keyword = arg[0]
@@ -711,7 +702,7 @@ def download_google_images(*arg):
 
 
 
-#Save Wikipedia Articles (only the text of the article)
+###### Save Wikipedia Articles (extract only the text of the article) ######
 def save_wikipedia_article(url,*arg):
     raw_page = download_page(url)
     start_heading = raw_page.find('<h1 id="firstHeading"')
@@ -769,21 +760,7 @@ def save_wikipedia_article(url,*arg):
     
     
 
-###### Wikipedia Crawler
-#Check for file type in URL so crawler does not crawl images and text files
-def wikipedia_extension_scan(url):
-    a = ['.png','.jpg','.jpeg','.gif','.tif','.txt','.svg']
-    j = 0
-    while j < (len(a)):
-        if a[j] in url:
-            flag2 = 1
-            break
-        else:
-            flag2 = 0
-            j = j+1
-    return flag2
-
-
+###### Wikipedia Crawler ######
 #URL parsing for incomplete or duplicate URLs
 def wikipedia_url_parse(url):
     seed_page = "https://en.wikipedia.org"  #Crawling the English Wikipedia
@@ -824,7 +801,6 @@ def wikipedia_url_parse(url):
         s = urlparse(url)   #Parse after every loop to update the values of url parameters
     return(url, flag)
 
-
 #Main Crawl function that calls all the above function and crawls the entire site sequentially
 def wikipedia_crawl(starting_page,*arg):  
     to_crawl = [starting_page]      #Define list name 'Seed Page'
@@ -834,7 +810,7 @@ def wikipedia_crawl(starting_page,*arg):
         urll = to_crawl.pop(0)      #If there are elements in to_crawl then pop out the first element
         urll,flag = wikipedia_url_parse(urll)
         #print(urll)
-        flag2 = wikipedia_extension_scan(urll)
+        flag2 = extension_scan(urll)
         time.sleep(1)
         
         #If flag = 1, then the URL is outside the seed domain URL
@@ -856,7 +832,7 @@ def wikipedia_crawl(starting_page,*arg):
                 
                 print("Title = " + heading)
                 print("Link = " + urll)                   
-                to_crawl = to_crawl + get_all_links(raw_html)
+                to_crawl = to_crawl + find_all_links(raw_html)
                 if len(to_crawl)>1000:
                     to_crawl = to_crawl[:999]
                 crawled.append(urll)
@@ -882,4 +858,18 @@ def wikipedia_crawl(starting_page,*arg):
                 file.write("Iteration No. = " + str(i) + ' | ' + "To Crawl = " + str(len(to_crawl)) + ' | ' + "Crawled = " + str(len(crawled)) + '\n\n')
                 file.close()                            #Close the file
     return ""
+
+
+
+#Google Seatch using the Search API
+def google_search(query):
+    query = urllib.urlencode ( { 'q' : query } )
+    response = urllib.urlopen ( 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&' + query ).read()
+    json = m_json.loads ( response )
+    results = json [ 'responseData' ] [ 'results' ]
+    for result in results:
+        title = result['title'].replace('<b>','').replace('</b>','')
+        link = result['url']
+        print (title + '; ' + link)
+        
 ########## End ##########
