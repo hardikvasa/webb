@@ -1,5 +1,6 @@
 MANIFEST.in
 README.md
+README.rst
 TODO.md
 setup.py
 webb/__init__.py

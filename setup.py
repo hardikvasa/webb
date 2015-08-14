@@ -31,7 +31,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 	
 setup(
       name='webb',
-      version='0.9.1.2',
+      version='0.9.2.5',
       description='An all-in-one Web Crawler, Web Parser and Web Scrapping library!',
       author='Hardik Vasa',
       maintainer='Hardik Vasa',
