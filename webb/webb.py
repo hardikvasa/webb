@@ -212,7 +212,7 @@ def url_normalize(url,seed_page):
     if url == "/":
         url = seed_page
         flag = 0
-        print url  
+        print (url)  
     if s.netloc == "":
         path = url.find('/')
         if path != -1:
