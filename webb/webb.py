@@ -23,12 +23,12 @@ except ImportError:
 ###### End of Import ######
 
 
-   
+
 ###### Get IP of a website from the URL ######
 def get_ip(url):
     ip = socket.gethostbyname(url)
     return ip
-    
+
 
 
 ###### Ping we Website (ICMP Ping) ######
@@ -38,7 +38,7 @@ def ping(host):
         stdout = subprocess.PIPE,
         stderr = subprocess.PIPE
     )
-    
+
     out, error = ping.communicate()
     return out
 
@@ -54,9 +54,9 @@ def traceroute(url,*arg):
         else:
             url = url
             break
-    url = urlparse(url) 
+    url = urlparse(url)
     url = url.netloc
-    print(url)        
+    print(url)
     p = Popen(['tracert', url], stdout=PIPE)
     while True:
         line = p.stdout.readline()
@@ -68,7 +68,7 @@ def traceroute(url,*arg):
         print(line2)
         if not line:
             break
-        
+
 
 
 ###### WHOIS Lookup ######
@@ -77,16 +77,16 @@ def perform_whois(server , query) :
     #socket connection
     s = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
     s.connect((server , 43))
-     
+
     s.send(query + '\r\n')  #send data
-     
+
     message = ''        #receive reply
     while len(message) < 10000:
         raw = s.recv(100)
         if(raw == ''):
             break
         message = message + raw
-     
+
     return message
 
 #Function to perform the whois on a domain name
@@ -94,15 +94,15 @@ def get_whois_data(domain):
     #remove scheme(http) and 'www'
     domain = domain.replace('http://','')
     domain = domain.replace('www.','')
-     
+
     #get the extension , .com , .org , .edu
     ext = domain[-3:]
-     
+
     #If top level domain .com .org .net
     if(ext == 'com' or ext == 'org' or ext == 'net'):
         whois = 'whois.internic.net'
         msg = perform_whois(whois , domain)
-         
+
         #Now scan the reply for the whois server
         lines = msg.splitlines()
         for line in lines:
@@ -111,15 +111,15 @@ def get_whois_data(domain):
                 if  'Whois' in words[0] and 'whois.' in words[1]:
                     whois = words[1].strip()
                     break;
-     
+
     #Or Regional/Country level - contact whois.iana.org to find the whois server of a particular TLD
     else:
         #Break again like , co.in to in
         ext = domain.split('.')[-1]
-         
+
         whois = 'whois.iana.org'  #Give the Whois server for the particular country
         msg = perform_whois(whois , ext)
-         
+
         lines = msg.splitlines()   #Get the reply for a whois server
         for line in lines:
             if ':' in line:
@@ -127,14 +127,14 @@ def get_whois_data(domain):
                 if 'whois.' in words[1] and 'Whois Server (port 43)' in words[0]:
                     whois = words[1].strip()
                     break;
-     
+
     msg = perform_whois(whois , domain) #Get reply from the final whois server
-     
+
     return msg
 
 
 
-###### Download HTML Page Main Function ######                
+###### Download HTML Page Main Function ######
 #Downloading entire Web Document (Raw Page Content) for the crawler
 def download_page(url,*arg):
     version = (3,0)
@@ -168,9 +168,9 @@ def download_page(url,*arg):
                 file.close()
                 return page
             else:
-                return page    
-        except:
-            return"Page Not found"
+                return page
+        except Exception as e:
+            print str(e)
 
 
 
@@ -212,7 +212,7 @@ def url_normalize(url,seed_page):
     if url == "/":
         url = seed_page
         flag = 0
-        print (url)  
+        print (url)
     if s.netloc == "":
         path = url.find('/')
         if path != -1:
@@ -245,7 +245,7 @@ def url_normalize(url,seed_page):
     if s.netloc != t.netloc:
         s = urlparse(url)
         url = url
-        flag = 1    
+        flag = 1
     if flag == 0:
         return url
     else:
@@ -286,7 +286,7 @@ def find_all_links(content):
             links.append(link)      #Append all the links in the list named 'Links'
             #time.sleep(0.1)
             page = page[end_link:]
-    return links 
+    return links
 
 
 
@@ -300,7 +300,7 @@ def url_parse(url,seed_page):
     while i<=7:
         if url == "/":
             url = seed_page
-            flag = 0  
+            flag = 0
         elif not s.scheme:
             url = "http://" + url
             flag = 0
@@ -314,19 +314,19 @@ def url_parse(url,seed_page):
         elif "www" not in url:
             url = "www."[:7] + url[7:]
             flag = 0
-            
+
         elif url[len(url)-1] == "/":
             url = url[:-1]
             flag = 0
         elif s.netloc != t.netloc:
             url = url
             flag = 1
-            break        
+            break
         else:
             url = url
             flag = 0
             break
-        
+
         i = i+1
         s = urlparse(url)   #Parse after every loop to update the values of url parameters
     return(url, flag)
@@ -335,25 +335,25 @@ def url_parse(url,seed_page):
 
 #Main function that crawls the entire web (out of domain) in breath first order
 def web_crawl(*arg):
-    
+
     to_crawl = [arg[0]]      #Define list name 'Seed Page'
     crawled=[]      #Define list name 'Seed Page'
-    
+
     a = urlparse(arg[0])
     seed_page = a.scheme+"://"+a.netloc
 
     i=0;        #Initiate Variable to count No. of Iterations
     while to_crawl:     #Continue Looping till the 'to_crawl' list is not empty
         urll = to_crawl.pop(0)      #If there are elements in to_crawl then pop out the first element
-        
+
         urll,flag = url_parse(urll,seed_page)
         flag2 = extension_scan(urll)
-        
+
         #If flag = 1, then the URL is outside the seed domain URL
         if flag2 == 1:
             pass        #Do Nothing
-            
-        else:       
+
+        else:
             if urll in crawled:     #Else check if the URL is already crawled
                 pass        #Do Nothing
             else:       #If the URL is not already crawled, then crawl i and extract all the links from it
@@ -364,7 +364,7 @@ def web_crawl(*arg):
                 #print(download_page(urll))
                 to_crawl = to_crawl + find_all_links(download_page(urll))
                 crawled.append(urll)
-                
+
                 #Remove duplicated from to_crawl
                 n = 1
                 j = 0
@@ -377,12 +377,12 @@ def web_crawl(*arg):
                         pass     #Do Nothing
                     j = j+1
             i=i+1    #Iteration Counter
-            
+
             #print(to_crawl)
             print("Iteration No. = " + str(i))
             print("Pages to Crawl = " + str(len(to_crawl)))
             print("Pages Crawled = " + str(len(crawled)))
-            
+
             if len(arg)>1:
                 if arg[2]=="write_log":
                     file = open('log.txt', 'a')        #Open the text file called database.txt
@@ -398,25 +398,25 @@ def web_crawl(*arg):
 
 #Main function crawls the entire site (in-domain) in breath first order
 def web_crawl_in_domain(*arg):
-    
+
     to_crawl = [arg[0]]      #Define list name 'Seed Page'
     crawled=[]      #Define list name 'Seed Page'
-    
+
     a = urlparse(arg[0])
     seed_page = a.scheme+"://"+a.netloc
 
     i=0;        #Initiate Variable to count No. of Iterations
     while to_crawl:     #Continue Looping till the 'to_crawl' list is not empty
         urll = to_crawl.pop(0)      #If there are elements in to_crawl then pop out the first element
-        
+
         urll,flag = url_parse(urll,seed_page)
         flag2 = extension_scan(urll)
-        
+
         #If flag = 1, then the URL is outside the seed domain URL
         if flag == 1 or flag2 == 1:
             pass        #Do Nothing
-            
-        else:       
+
+        else:
             if urll in crawled:     #Else check if the URL is already crawled
                 pass        #Do Nothing
             else:       #If the URL is not already crawled, then crawl i and extract all the links from it
@@ -427,7 +427,7 @@ def web_crawl_in_domain(*arg):
                 #print(download_page(urll))
                 to_crawl = to_crawl + find_all_links(download_page(urll))
                 crawled.append(urll)
-                
+
                 #Remove duplicated from to_crawl
                 n = 1
                 j = 0
@@ -440,12 +440,12 @@ def web_crawl_in_domain(*arg):
                         pass     #Do Nothing
                     j = j+1
             i=i+1    #Iteration Counter
-            
+
             #print(to_crawl)
             print("Iteration No. = " + str(i))
             print("Pages to Crawl = " + str(len(to_crawl)))
             print("Pages Crawled = " + str(len(crawled)))
-            
+
             if len(arg)>1:
                 if arg[2]=="write_log":
                     file = open('log.txt', 'a')        #Open the text file called database.txt
@@ -508,7 +508,7 @@ def get_all_headings_as_list(url,heading_type):
             links.append(link)      #Append all the links in the list named 'Links'
             #time.sleep(0.1)
             page = page[end_link:]
-    return links 
+    return links
 
 # Get all the headings from get_all_headings_as_list
 def get_all_headings(*arg):
@@ -551,7 +551,7 @@ def get_all_paragraphs_as_list(url):
             links.append(link)      #Append all the links in the list named 'Links'
             #time.sleep(0.1)
             page = page[end_link:]
-    return links 
+    return links
 
 #Get all the paragraphs one below the other with the help of get_all_paragraphs_as_list for users
 def get_all_paragraphs(url):
@@ -561,7 +561,7 @@ def get_all_paragraphs(url):
 
 
 
-######### Download Images From a Web Page and store it on hard drive #########        
+######### Download Images From a Web Page and store it on hard drive #########
 #Finding 'Next Image Link' for get_all_images
 def get_next_images_link(s):
     start_line = s.find("<img")
@@ -574,7 +574,7 @@ def get_next_images_link(s):
         end_link = s.find('"',start_link+5)
         link = str(s[start_link+5:end_link])
         return link, end_link
-          
+
 #Getting all image links with the help of 'get_next_links' for get_all_images
 def get_all_images_links(url):
     page = download_page(url)
@@ -586,7 +586,7 @@ def get_all_images_links(url):
         else:
             links.append(link)      #Append all the links in the list named 'Links'
             page = page[end_link:]
-    return links 
+    return links
 
 #Download all images in hard disk
 def get_all_images(*arg):
@@ -626,7 +626,7 @@ def get_next_image_link(s):
         end_content = s.find('&amp;',start_content+1)
         content_raw = str(s[start_content+7:end_content])
         return content_raw, end_content
-          
+
 
 #Getting all links with the help of 'get_next_image_link'
 def get_all_image_links(page):
@@ -654,33 +654,33 @@ def download_google_images(*arg):
             print (iteration)
             search_keywords = search_keyword[i]
             search = search_keywords.replace(' ','%20')
-            
+
             url = 'https://www.google.com/search?q=' + search +  '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
             raw_html =  (download_page(url))
             items = items + (get_all_image_links(raw_html))
-                
+
             print ("Image Links = "+str(items))
             print ("Total Image Links = "+str(len(items)))
             print ("\n")
             i = i+1
-                
+
             info = open('output.txt', 'a')        #Open the text file called database.txt
             info.write(str(i) + ': ' + str(search_keyword[i-1]) + ": " + str(items) + "\n\n\n")     #Write the title of the page
-            info.close()                            #Close the file      
+            info.close()                            #Close the file
     else:
         items = []
         iteration = "Item name = " + str(search_keyword)
         print (iteration)
         search = search_keyword.replace(' ','%20')
-        
+
         url = 'https://www.google.com/search?q=' + search +  '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
         raw_html =  (download_page(url))
         items = items + (get_all_image_links(raw_html))
-            
+
         print ("Image Links = "+str(items))
         print ("Total Image Links = "+str(len(items)))
         print ("\n")
-            
+
         info = open('output.txt', 'a')        #Open the text file called database.txt
         info.write(str(search_keyword) + ": " + str(items) + "\n\n\n")         #Write the title of the page
         info.close()                            #Close the file
@@ -717,7 +717,7 @@ def save_wikipedia_article(url,*arg):
         find_heading = raw_page.find('<span class="mw-headline"')
         if find_paragraph == -1 or find_heading == -1:
             break
-        else: 
+        else:
             if find_paragraph < find_heading:
                 #extract paragraph
                 start_paragraph = raw_page.find('<p>')
@@ -757,8 +757,8 @@ def save_wikipedia_article(url,*arg):
         return page
     else:
         return page
-    
-    
+
+
 
 ###### Wikipedia Crawler ######
 #URL parsing for incomplete or duplicate URLs
@@ -777,7 +777,7 @@ def wikipedia_url_parse(url):
     while i<=9:
         if url == "/":
             url = seed_page_n
-            flag = 0  
+            flag = 0
         elif not s.scheme:
             url = "http://" + url
             flag = 0
@@ -789,20 +789,20 @@ def wikipedia_url_parse(url):
             flag = 0
         elif s.netloc == "":
             url = seed_page + s.path
-            flag = 0    
+            flag = 0
         elif url[len(url)-1] == "/":
             url = url[:-1]
             flag = 0
         else:
             url = url
             flag = 0
-            break  
+            break
         i = i+1
         s = urlparse(url)   #Parse after every loop to update the values of url parameters
     return(url, flag)
 
 #Main Crawl function that calls all the above function and crawls the entire site sequentially
-def wikipedia_crawl(starting_page,*arg):  
+def wikipedia_crawl(starting_page,*arg):
     to_crawl = [starting_page]      #Define list name 'Seed Page'
     crawled=[]      #Define list name 'Seed Page'
     i=0        #Initiate Variable to count No. of Iterations
@@ -812,31 +812,31 @@ def wikipedia_crawl(starting_page,*arg):
         #print(urll)
         flag2 = extension_scan(urll)
         time.sleep(1)
-        
+
         #If flag = 1, then the URL is outside the seed domain URL
         if flag == 1 or flag2 == 1:
             pass        #Do Nothing
-            
-        else:       
+
+        else:
             if urll in crawled:     #Else check if the URL is already crawled
                 pass        #Do Nothing
             else:       #If the URL is not already crawled, then crawl i and extract all the links from it
                 raw_html = download_page(urll)
                 #print(raw_html)
-                
+
                 start_heading = raw_html.find('<h1 id="firstHeading"')
                 end_start_heading = raw_html.find('>',start_heading+1)
                 end_heading = raw_html.find('</h1>',end_start_heading+1)
                 heading = raw_html[end_start_heading+1:end_heading]
                 heading = heading.replace('<i>', '').replace('</i>','')
-                
+
                 print("Title = " + heading)
-                print("Link = " + urll)                   
+                print("Link = " + urll)
                 to_crawl = to_crawl + find_all_links(raw_html)
                 if len(to_crawl)>1000:
                     to_crawl = to_crawl[:999]
                 crawled.append(urll)
-                                
+
                 #Remove duplicated from to_crawl
                 n = 1
                 j = 0
@@ -871,5 +871,5 @@ def google_search(query):
         title = result['title'].replace('<b>','').replace('</b>','')
         link = result['url']
         print (title + '; ' + link)
-        
+
 ########## End ##########
