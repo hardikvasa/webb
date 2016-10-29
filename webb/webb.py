@@ -12,6 +12,7 @@ import re
 import json as m_json
 import socket
 import urllib
+from bs4 import BeautifulSoup
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -268,25 +269,25 @@ def find_next_link(s):
         return link, end_quote
 
 #Getting all links as list with the help of 'get_next_links' for users
-def find_all_links(content):
-    if content.startswith('http') or content.startswith('www'):
-        url = content
-        if "http" not in url:
-            url = "http://" + url
-        if "www" not in url:
-            url = "www."[:7] + url[7:]
-        content = download_page(url)
-    page = content
-    links = []
-    while True:
-        link, end_link = find_next_link(page)
-        if link == "no_links":
-            break
-        else:
-            links.append(link)      #Append all the links in the list named 'Links'
-            #time.sleep(0.1)
-            page = page[end_link:]
-    return links
+    def find_all_links(content):
+        if content.startswith('http') or content.startswith('www'):
+            url = content
+            if "http" not in url:
+                url = "http://" + url
+            if "www" not in url:
+                url = "www."[:7] + url[7:]
+            content = download_page(url)
+        page = content
+        links = []
+        while True:
+            link, end_link = find_next_link(page)
+            if link == "no_links":
+                break
+            else:
+                links.append(link)      #Append all the links in the list named 'Links'
+                #time.sleep(0.1)
+                page = page[end_link:]
+            return links
 
 
 
@@ -871,5 +872,25 @@ def google_search(query):
         title = result['title'].replace('<b>','').replace('</b>','')
         link = result['url']
         print (title + '; ' + link)
+
+
+
+#Getting the list of all ids' name present in the webpage with the help of get_all_id function
+def get_all_id(page):
+    soup = BeautifulSoup(page, 'html.parser')
+    ids = []
+    for tag in soup.findAll(True,{'id':True}) :
+        ids.append(tag['id'])
+    return ids
+
+
+
+#Getting the list of all class names present in the webpage with the help of get_all_class function
+def get_all_class(page):
+     soup = BeautifulSoup(page, 'html.parser')
+     classes = []
+     for tag in soup.findAll(True,{'class':True}) :
+         classes.append(tag['class'])
+     return classes
 
 ########## End ##########
