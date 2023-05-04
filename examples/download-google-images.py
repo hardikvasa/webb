@@ -1,5 +1,5 @@
 #Importing the 'webb' library
-import webb
+from webb.webb import download_google_images
 
 #Downloading the web page and printing it
-webb.download_google_images("Flowers")
+download_google_images("Flowers") # first input is for which image you want to download and second for how many images you want
