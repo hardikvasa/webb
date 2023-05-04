@@ -4,6 +4,9 @@
 #
 
 #Import Libraries
+import os
+import requests
+from bs4 import BeautifulSoup
 import time     #For Delay calculations
 import sys    #for system related information
 from subprocess import Popen, PIPE
@@ -170,7 +173,7 @@ def download_page(url,*arg):
             else:
                 return page
         except Exception as e:
-            print str(e)
+            print(e)
 
 
 
@@ -559,148 +562,42 @@ def get_all_paragraphs(url):
     for i in lists:
         print(i)
 
+def download_google_images(search, n_images):
+
+        
+    # download first n images from google image search
+    GOOGLE_IMAGE = 'https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=990&'
 
 
-######### Download Images From a Web Page and store it on hard drive #########
-#Finding 'Next Image Link' for get_all_images
-def get_next_images_link(s):
-    start_line = s.find("<img")
-    if start_line == -1:    #If no links are found then give an error!
-        end_quote = 0
-        link = "no_links"
-        return link, end_quote
-    else:
-        start_link = s.find('src=', start_line)
-        end_link = s.find('"',start_link+5)
-        link = str(s[start_link+5:end_link])
-        return link, end_link
+    usr_agent = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        'Accept-Encoding': 'none',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Connection': 'keep-alive'
+    }
 
-#Getting all image links with the help of 'get_next_links' for get_all_images
-def get_all_images_links(url):
-    page = download_page(url)
-    links = []
-    while True:
-        link, end_link = get_next_images_link(page)
-        if link == "no_links":
-            break
-        else:
-            links.append(link)      #Append all the links in the list named 'Links'
-            page = page[end_link:]
-    return links
+    # Creating images foleder if not exists
+    if not os.path.exists('images'):
+        os.mkdir('images')
 
-#Download all images in hard disk
-def get_all_images(*arg):
-    url = arg[0]
-    import urllib
-    links = get_all_images_links(url)
-    print(links)
-    if len(arg)>1 and arg[1] == "download":
-        s = urlparse(url)
-        seed_page = s.scheme+'://'+s.netloc
-        i = 0
-        while i<len(links):
-            link,flag = url_parse(links[i],seed_page)
-            print("downloading --> "+link)
-            try:
-                file = urllib.URLopener()
-                file.retrieve(link, str("img "+str(i)+".jpg"))
-            except:
-                pass
-            i = i+1
-    else:
-        pass
+    #Crating search url for search input
+    searchurl = GOOGLE_IMAGE + 'q=' + search
 
+    #getting link
+    response = requests.get(searchurl, headers=usr_agent)
 
+    #Finding image in html
+    soup = BeautifulSoup(response.text, 'html.parser')
+    results = soup.find_all('img', {'class': 'yWs4tf'}, limit=n_images)
 
-############## Download Google Images ############
-#Finding 'Next Image' from the given raw page for users (image search)
-def get_next_image_link(s):
-    start_line = s.find('rg_di')
-    if start_line == -1:    #If no links are found then give an error!
-        end_quote = 0
-        link = "no_images"
-        return link, end_quote
-    else:
-        start_line = s.find('"class="rg_di"')
-        start_content = s.find('imgurl=',start_line+1)
-        end_content = s.find('&amp;',start_content+1)
-        content_raw = str(s[start_content+7:end_content])
-        return content_raw, end_content
-
-
-#Getting all links with the help of 'get_next_image_link'
-def get_all_image_links(page):
-    items = []
-    while True:
-        item, end_content = get_next_image_link(page)
-        if item == "no_images":
-            break
-        else:
-            items.append(item)      #Append all the links in the list named 'Links'
-            #time.sleep(0.1)        #Timer could be used to slow down the request for image downloads
-            page = page[end_content:]
-    return items
-
-#Download Images
-def download_google_images(*arg):
-    import urllib
-    search_keyword = arg[0]
-    result = (str(type(search_keyword)))
-    if 'list' in result:
-        i= 0
-        while i<len(search_keyword):
-            items = []
-            iteration = "Item no.: " + str(i+1) + " -->" + " Item name = " + str(search_keyword[i])
-            print (iteration)
-            search_keywords = search_keyword[i]
-            search = search_keywords.replace(' ','%20')
-
-            url = 'https://www.google.com/search?q=' + search +  '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
-            raw_html =  (download_page(url))
-            items = items + (get_all_image_links(raw_html))
-
-            print ("Image Links = "+str(items))
-            print ("Total Image Links = "+str(len(items)))
-            print ("\n")
-            i = i+1
-
-            info = open('output.txt', 'a')        #Open the text file called database.txt
-            info.write(str(i) + ': ' + str(search_keyword[i-1]) + ": " + str(items) + "\n\n\n")     #Write the title of the page
-            info.close()                            #Close the file
-    else:
-        items = []
-        iteration = "Item name = " + str(search_keyword)
-        print (iteration)
-        search = search_keyword.replace(' ','%20')
-
-        url = 'https://www.google.com/search?q=' + search +  '&espv=2&biw=1366&bih=667&site=webhp&source=lnms&tbm=isch&sa=X&ei=XosDVaCXD8TasATItgE&ved=0CAcQ_AUoAg'
-        raw_html =  (download_page(url))
-        items = items + (get_all_image_links(raw_html))
-
-        print ("Image Links = "+str(items))
-        print ("Total Image Links = "+str(len(items)))
-        print ("\n")
-
-        info = open('output.txt', 'a')        #Open the text file called database.txt
-        info.write(str(search_keyword) + ": " + str(items) + "\n\n\n")         #Write the title of the page
-        info.close()                            #Close the file
-
-
-        if len(arg)>1 and arg[1] == "download":
-            i = 0
-            while i<len(items):
-                link = items[i]
-                try:
-                    file = urllib.URLopener()
-                    file.retrieve(link, str("img "+str(i)+".jpg"))
-                    print("downloaded --> "+ link)
-                except:
-                    pass
-                i = i+1
-        else:
-            pass
-
-
+    #storing each image in images folder
+    for i,img in enumerate(results):
+        res= requests.get(img['src'])
+        img_name = 'images' + '/' + search + str(i+1) + '.png'
+        with open(img_name, 'wb') as f:
+            f.write(res.content)
 
 ###### Save Wikipedia Articles (extract only the text of the article) ######
 def save_wikipedia_article(url,*arg):
