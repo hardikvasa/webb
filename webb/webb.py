@@ -12,6 +12,7 @@ import re
 import json as m_json
 import socket
 import urllib
+import os
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -57,7 +58,11 @@ def traceroute(url,*arg):
     url = urlparse(url)
     url = url.netloc
     print(url)
-    p = Popen(['tracert', url], stdout=PIPE)
+    print(os.name)
+    if os.name == "posix":
+        p = Popen(['traceroute', url], stdout=PIPE)
+    else:
+        p = Popen(['tracert', url], stdout=PIPE)
     while True:
         line = p.stdout.readline()
         line2 = str(line).replace('\\r','').replace('\\n','')
