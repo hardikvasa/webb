@@ -58,7 +58,6 @@ def traceroute(url,*arg):
     url = urlparse(url)
     url = url.netloc
     print(url)
-    print(os.name)
     if os.name == "posix":
         p = Popen(['traceroute', url], stdout=PIPE)
     else:
